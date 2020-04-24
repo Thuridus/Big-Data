@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-memcache-deployment
+  labels:
+    app: my-memcache-deployment
+spec:
+  # A single memcache instance
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-memcache
+  template:
+    metadata:
+      labels:
+        app: my-memcache
+    spec:
+      containers:
+        - name: my-memcache
+          image: memcached:alpine
+          ports:
+            - containerPort: 11211
+#          resources:
+#            requests:
+#              cpu: 1
+#              memory: "100M"
+#            limits:
+#              cpu: 2
+#              memory: "200M"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-memcache-service
+spec:
+  # Headless service (i.e., no ip is assigned)
+  clusterIP: None
+  selector:
+    app: my-memcache            

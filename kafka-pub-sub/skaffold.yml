@@ -1,0 +1,36 @@
+apiVersion: skaffold/v2alpha4
+kind: Config
+build:
+  artifacts:
+    - image: python-kafka-publisher-demo
+      context: python-publisher
+    - image: python-kafka-subscriber-demo
+      context: python-subscriber
+
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      artifacts:
+        - image: python-kafka-publisher-demo
+          context: python-publisher
+          docker:
+            buildArgs:
+              DEBUG: 1
+        #          sync:
+        #            infer:
+        #              - "src"
+        - image: python-kafka-subscriber-demo
+          context: python-subscriber
+          docker:
+            buildArgs:
+              DEBUG: 1
+#          sync:
+#            infer:
+#              - "src"
+deploy:
+  kubectl:
+    manifests:
+      - ./python-publisher/k8s/*
+      - ./python-subscriber/k8s/*
