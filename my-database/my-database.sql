@@ -14,7 +14,7 @@
 
 
 CREATE Table `infects` (
-    `date` date(100) NOT NUll,
+    `date` date NOT NUll,
     `cases` int(100) NOT Null,
     `county` varchar(100) default NULL,
     `continent` varchar(100) default NULL,
