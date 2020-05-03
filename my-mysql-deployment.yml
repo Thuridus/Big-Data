@@ -23,7 +23,7 @@ spec:
           args:
             - "-o"
             - "/tmp/data/init.sql" # we are saving downloaded file as init.sql in /tmp/data directory
-            - "https://farberg.de/talks/big-data/02-Microservices-docker-compose/mysql-data.sql"
+            - "https://raw.githubusercontent.com/Thuridus/Big-Data/develop/my-database/my-database.sql"
           volumeMounts:
             - name: data-volume
               mountPath: /tmp/data
@@ -36,14 +36,14 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               value: "mysecretpw"
             - name: MYSQL_DATABASE
-              value: "sportsdb"
+              value: "mysqldb"
           # Mount the volume that has been populated by the init container
           volumeMounts:
             - name: data-volume
               mountPath: /docker-entrypoint-initdb.d/
           ports:
-            - containerPort: 3306
-            - containerPort: 33060
+            - containerPort: 3306 #interner Pod
+            - containerPort: 33060 # externer Pod
           livenessProbe:
             tcpSocket:
               port: 33060
