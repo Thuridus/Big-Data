@@ -15,7 +15,7 @@ const dbConfig = {
 	password: 'mysecretpw',
 	host: 'my-app-mysql-service',
 	port: 33060,
-	schema: 'sportsdb'
+	schema: 'mysqldb'
 };
 
 async function getMemcachedServersFromDns() {
