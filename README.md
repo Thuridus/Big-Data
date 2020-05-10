@@ -3,7 +3,7 @@
 Big Data Platform (PoC) to run a Corona App .... whatever
 
 ## TODO
-Description of idea, architecture, design and screenshots of demo 
+Description of idea, architecture, design and screenshots of demo  
 Licence for code (Apache) for documentation (Creative Commons)
 ....
 
