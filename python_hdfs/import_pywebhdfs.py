@@ -1,15 +1,12 @@
 import pywebhdfs.webhdfs
 import logging
-import os
+import socket
 
 # Enable to get verbose logging
 # logging.basicConfig(level=logging.DEBUG)
 
-webhdfs_host = os.getenv('KNOX_IP', '172.17.11.254')
-webhdfs_port = os.getenv('KNOX_PORT', '8080')
-webhdfs_address = 'http://172.17.11.248:30201' #os.getenv('KNOX_ADDRESS','http://172.17.11.254:8080')
-
-loltest = os.getenv('DriverData', '8080')
+webhdfs_address = socket.gethostbyname("knox-apache-knox-helm-svc")
+print(webhdfs_address)
 
 example_dir = '/user/root/input/example/'
 example_file = '/user/root/input/example/example.txt'
@@ -17,10 +14,10 @@ example_data = '01010101010101010101010101010101010101010101\n'
 rename_dir = '/user/root/input/example_rename'
 
 # create a new client instance
-#hdfs = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"http://{webhdfs_host}:{webhdfs_port}/webhdfs/v1/",
- #                                        request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
-hdfs = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{webhdfs_address}/webhdfs/v1/",
+hdfs = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"http://{webhdfs_address}:8080/webhdfs/v1/",
                                          request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
+#hdfs = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{webhdfs_address}/webhdfs/v1/",
+ #                                        request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
 
 
 # List root dir
