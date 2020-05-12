@@ -9,11 +9,13 @@ from pyspark.sql import SparkSession
 
 
 # %%
-inputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/Boston_Housing_Data.csv"
+# inputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/Boston_Housing_Data.csv"
+inputFile = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/Boston_Housing_Data.csv"
 
 
 # %%
-outputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/Test_LS.txt"
+# outputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/Test_LS.txt"
+outputFile = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/Test_LS.txt"
 
 
 # %%
