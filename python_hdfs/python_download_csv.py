@@ -48,9 +48,9 @@ def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_e
     df = pandas.DataFrame(data=result)
     
     if hdfs_connection.exists_file_dir(hdfs_export_filename):
-        hdfs_connection.append_file(hdfs_export_filename, df.to_csv(sep=";",index=False, line_terminator='\n'), overwrite=True, permission=777)
-    else:
-        hdfs_connection.create_file(hdfs_export_filename, df.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
+        hdfs_connection.delete_file_dir(hdfs_export_filename)
+
+    hdfs_connection.create_file(hdfs_export_filename, df.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
 
 
 def import_infections(import_url, hdfs_connection, hdfs_path_infection):
@@ -61,12 +61,12 @@ def import_infections(import_url, hdfs_connection, hdfs_path_infection):
     responsedf = pandas.json_normalize(jsonresponse)
 
     if hdfs_connection.exists_file_dir(hdfs_export_filename):
-        hdfs_connection.append_file(hdfs_export_filename, responsedf.to_csv(sep=";",index=False, line_terminator='\n'), overwrite=True, permission=777)
-    else:
-        hdfs_connection.create_file(hdfs_export_filename, responsedf.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
+        hdfs_connection.delete_file_dir(hdfs_export_filename)
+    
+    hdfs_connection.create_file(hdfs_export_filename, responsedf.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
 
 
-#hdfspath = "http://10.0.2.15:31456"
+#hdfspath = "http://10.0.2.15:31369"
 hdfspath = "http://" + str(socket.gethostbyname("knox-apache-knox-helm-svc")) + ":8080"
 enddate = datetime.date.today().strftime("%Y-%m-%d")
 startdate = "2020-01-01"
