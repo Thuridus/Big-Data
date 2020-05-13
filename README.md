@@ -1,4 +1,4 @@
-# Big Data Platform
+# Big Data Platform :poop:
 
 Big Data Platform (PoC) to run a Corona App .... whatever
 
