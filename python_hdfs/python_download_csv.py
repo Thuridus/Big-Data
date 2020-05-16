@@ -7,9 +7,10 @@ import pandas
 import datetime
 import os
 import socket
+import kafka
 
 
-def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_export_path, hdfs_connection):
+def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_export_path, hdfs_connection, kafka_producer):
     first = True
     result = dict()
     hdfs_export_filename = hdfs_export_path + "/quandl_fse.csv"
@@ -51,9 +52,10 @@ def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_e
         hdfs_connection.delete_file_dir(hdfs_export_filename)
 
     hdfs_connection.create_file(hdfs_export_filename, df.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
+    kafka_producer.send("new_data_available", hdfs_export_filename)
 
 
-def import_infections(import_url, hdfs_connection, hdfs_path_infection):
+def import_infections(import_url, hdfs_connection, hdfs_path_infection, kafka_producer):
     response = requests.get(import_url)
     jsonresponse = response.json()["records"]
     hdfs_export_filename = hdfs_path_infection + "/infections.cvs"
@@ -64,6 +66,7 @@ def import_infections(import_url, hdfs_connection, hdfs_path_infection):
         hdfs_connection.delete_file_dir(hdfs_export_filename)
     
     hdfs_connection.create_file(hdfs_export_filename, responsedf.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
+    kafka_producer.send("new_data_available", hdfs_export_filename)
 
 
 #hdfspath = "http://10.0.2.15:31369"
@@ -95,10 +98,11 @@ if len(root_dir) > 0:
                 if dir3["pathSuffix"] == "fse":
                     foundFSE = True
 
+producer = kafka.KafkaProducer(bootstrap_servers='my-cluster-kafka-bootstrap:9092')
 
 if foundInfections and foundFSE:
     while True:
-        import_fse(quandl_companies, startdate, enddate, fse_file_path, hdfsconn)
-        import_infections(infection_import_url, hdfsconn, infection_file_path)
+        import_fse(quandl_companies, startdate, enddate, fse_file_path, hdfsconn, producer)
+        import_infections(infection_import_url, hdfsconn, infection_file_path, producer)
         print("import process finished successfully! Next import will be in 1 hour")
         time.sleep(3600)
