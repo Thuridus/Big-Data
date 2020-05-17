@@ -72,7 +72,7 @@ docker build -t python_download .
 Apply the import deployment
 ```
 #navigate to the python_hdfs directory
-minikube apply -f python_import_deployment.yml
+kubectl apply -f python_import_deployment.yml
 ```
 
 To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
