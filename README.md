@@ -118,8 +118,13 @@ USE mysqldb
 ```
 
 ```
-#Get all entries from database
+#Get all entries from database (e.x from the table infects) with a sql-statement
 Select * from infects;
+```
+
+```
+#Leave the database
+exit
 ```
 
 
