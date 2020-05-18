@@ -18,4 +18,3 @@ CREATE Table `dax` (
     `diff` float(100) default NULL,
 PRIMARY KEY  (`date`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-INSERT INTO `infects` (`date`,`open`,`close`,`diff`) VALUE
