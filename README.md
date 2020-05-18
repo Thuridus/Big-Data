@@ -89,7 +89,7 @@ minikube service knox-apache-knox-helm-svc --url
 
 ### Create necessary POD
 
-Build a connection to the my-database folder
+Build a connection to the "my-database" folder
 ```
 #navigate to the folder my-database
 cd my-database
