@@ -1,4 +1,5 @@
 
+
 CREATE Table `infects` (
     `date` date NOT NUll,
     `cases` int(100) NOT Null,
@@ -17,4 +18,3 @@ CREATE Table `dax` (
     `close` decimal(6,4) default NULL,
     `diff` decimal(6,4) default NULL,
 PRIMARY KEY  (`date`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
