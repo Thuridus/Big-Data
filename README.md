@@ -4,7 +4,7 @@ Big Data Platform (PoC) to run a Corona App .... whatever
 
 ## TODO
 Description of idea, architecture, design and screenshots of demo  
-Licence for code (Apache) for documentation (Creative Commons)
+Licence for documentation (Creative Commons)
 ....
 
 ### Prerequisites
@@ -15,22 +15,27 @@ TODO: What things you need to install the software and how to install them
 Docker
 minikube
 helm
+? python3 spark pyspark 
 ```
-## Starting minikube on Win 10
+## Starting minikube
 
 Start minicube with Hyper V driver (make sure Hyper V is enabled)
 ```
-minikube start --driver=hyperv --memory 4096 --cpus 4
+#on Win 10
+minikube start --driver=hyperv --memory 5120 --cpus 4
+
+#on Mac
+minikube start --vm-driver=hyperkit --memory 5120 --cpus 4
 ```
 Pointing Docker daemon to minicube regestry
 ```
+#on Win 10
 minikube docker-env
 minikube -p minikube docker-env | Invoke-Expression
+
+#on Mac
+eval $(minikube docker-env)
 ```
-
-
-
-
 
 ## Deploy HDFS and Apache Spark on K8S:
 ### Deploying HDFS
@@ -67,7 +72,7 @@ docker build -t python_download .
 Apply the import deployment
 ```
 #navigate to the python_hdfs directory
-minikube apply -f python_import_deployment.yml
+kubectl apply -f python_import_deployment.yml
 ```
 
 To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
@@ -76,7 +81,7 @@ To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
 minikube service knox-apache-knox-helm-svc --url
 ```
 
-### TODO: put a data file and a pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
+### TODO: put a pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
 
 
 
