@@ -119,7 +119,7 @@ USE mysqldb
 
 ```
 #Get all entries from database
-Select * from infects"
+Select * from infects;
 ```
 
 
