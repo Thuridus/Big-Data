@@ -90,7 +90,7 @@ minikube service knox-apache-knox-helm-svc --url
 ### Create necessary POD
 
 Build a connection to the my-database folder
-```cd my-database
+``#cd my-database
 ```
 
 Apply the import deployment
