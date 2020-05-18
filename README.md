@@ -85,3 +85,27 @@ minikube service knox-apache-knox-helm-svc --url
 
 
 
+## Connection to the Database
+
+### Create necessary POD
+Apply the import deployment
+```
+#navigate to the folder my-database
+kubectl apply -f my-mysql-deployment.yml
+```
+```
+#To be sure that the POD is running and to get the POD-name, enter
+kubect get pod -o wide
+```
+
+```
+#Enter the pod to check it is working
+kubect exec -ti [POD-name]-- mysl -u root --password=mysecretpw -e
+```
+
+```
+#Get all entries from database
+kubect USE mysqldb: "Select * from infects"
+```
+
+
