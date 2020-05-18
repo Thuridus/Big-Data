@@ -18,4 +18,3 @@ CREATE Table `dax` (
     `diff` decimal(6,4) default NULL,
 PRIMARY KEY  (`date`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-
