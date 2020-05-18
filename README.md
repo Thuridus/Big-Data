@@ -90,12 +90,16 @@ minikube service knox-apache-knox-helm-svc --url
 ### Create necessary POD
 
 Build a connection to the my-database folder
-``#cd my-database
-```
-
-Apply the import deployment
 ```
 #navigate to the folder my-database
+cd my-database
+```
+
+
+
+Create a deployment and deploy it to minikube
+
+```
 kubectl apply -f my-mysql-deployment.yml
 ```
 ```
@@ -107,8 +111,11 @@ kubectl get pods -o wide
 #Enter the pod to check if its working
 kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
 ```
+
 Build a connection to the database "my-database.sql" and get the entries
-```kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
+
+```
+#kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
    USE mysqldb
 ```
 
