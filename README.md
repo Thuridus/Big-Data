@@ -95,10 +95,7 @@ Build a connection to the my-database folder
 cd my-database
 ```
 
-
-
-Create a deployment and deploy it to minikube
-
+Create a POD and deploy it to minikube
 ```
 kubectl apply -f my-mysql-deployment.yml
 ```
@@ -112,11 +109,12 @@ kubectl get pods -o wide
 kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
 ```
 
-Build a connection to the database "my-database.sql" and get the entries
+### Create Connection to database
 
+Build a connection to the database "my-database.sql" and get the entries
 ```
 #kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
-   USE mysqldb
+USE mysqldb
 ```
 
 ```
