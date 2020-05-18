@@ -12,7 +12,7 @@ INSERT INTO `infects` (`date`,`cases`,`death`,`country`) VALUES ('02.05.2020','1
 
 
 CREATE Table `dax` (
-    `daxvalue` decimal(100) default NULL,
+    `daxvalue` decimal(6,2) default NULL,
     `date` date NOT NUll,
     `open` float(100) default NULL,
     `close` float(100) default NULL,
