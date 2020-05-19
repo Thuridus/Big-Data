@@ -11,47 +11,21 @@ import kafka
 
 
 def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_export_path, hdfs_connection, kafka_producer):
-    first = True
-    result = dict()
     hdfs_export_filename = hdfs_export_path + "/quandl_fse.csv"
+    resultdf = pandas.DataFrame()
 
     for company in quandl_companies_list:
         data = quandl.get("FSE/" + company, start_date = quandl_start_date, end_date = quandl_end_date)
-
-        vals = list(data.values)
-        if first:
-            headers = list(data.columns)
-            headers.insert(0, 'share')
-            first = False
-        
-        j = 0
-        for val in vals:
-            tmpval = list(val)
-            tmpval.insert(0, company)
-            vals[j] = tmpval
-            j+=1
-
-        i = 0
-        for header in headers:
-            tmpresult = list()
-            for val in vals:
-                tmpresult.append(val[i])
-            if len(tmpresult) == 0:
-                break
-
-            if header in result:
-                result[header].extend(tmpresult)
-            else:
-                result[header] = tmpresult
-            i+=1
-        print("added " + company + " to csv output")
+        data['Share'] = company
+        resultdf = pandas.concat([resultdf, data])
     
-    df = pandas.DataFrame(data=result)
+    resultdf = resultdf[['Share','Open','High','Low', 'Close', 'Change', 'Traded Volume', 'Turnover', 'Last Price of the Day', 'Daily Traded Units','Daily Turnover']]
+    resultdf.groupby('Share')
     
     if hdfs_connection.exists_file_dir(hdfs_export_filename):
         hdfs_connection.delete_file_dir(hdfs_export_filename)
 
-    hdfs_connection.create_file(hdfs_export_filename, df.to_csv(sep=";",index=False, line_terminator='\n'), permission=777)
+    hdfs_connection.create_file(hdfs_export_filename, resultdf.to_csv(sep=";",index=True, line_terminator='\n'), permission=777)
     kafka_producer.send("new_data_available", hdfs_export_filename)
 
 
@@ -69,7 +43,6 @@ def import_infections(import_url, hdfs_connection, hdfs_path_infection, kafka_pr
     kafka_producer.send("new_data_available", hdfs_export_filename)
 
 
-#hdfspath = "http://10.0.2.15:31369"
 hdfspath = "http://" + str(socket.gethostbyname("knox-apache-knox-helm-svc")) + ":8080"
 enddate = datetime.date.today().strftime("%Y-%m-%d")
 startdate = "2020-01-01"
