@@ -113,7 +113,7 @@ kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
 
 Build a connection to the database "my-database.sql" and get the entries
 ```
-#kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
+#kubectl exec -ti [POD-name(my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
 USE mysqldb
 ```
 
