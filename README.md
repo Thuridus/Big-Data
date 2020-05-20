@@ -102,11 +102,12 @@ kubectl apply -f my-mysql-deployment.yml
 ```
 #To be sure that the POD is running and to get the POD-name, enter
 kubectl get pods -o wide
+#You have to choose the POD with the name my-mysql-deployment-xxxxxxxxx-xxxxx (x=numbers/characters)
 ```
 
 ```
 #Enter the pod to check if its working
-kubectl exec -ti [POD-name] -- mysql -u root --password=mysecretpw
+kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
 ```
 
 ### Create Connection to database
