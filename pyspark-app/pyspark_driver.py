@@ -2,12 +2,13 @@ from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.functions import to_date, expr, current_date, date_sub, date_format
 from pyspark.sql.functions import sum
 
-# inputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
-# inputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
+# inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
+# inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
 inputInfections = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/infections.csv"
 inputDAX = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/quandl_fse.csv"
 
-# outputFile = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results"
+# outputFileCorona = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/corona"
+# outputFileDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/dax"
 outputFileCorona = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/corona"
 outputFileDAX = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/dax"
 
@@ -71,7 +72,7 @@ dax_in1.show()
 #dax_in1.groupBy("Date").sum("Open").alias("open_sum").show()
 #calculate DAX value as a total ammount of all stock values for each date
 dax = spark.sql( "SELECT Date, SUM(Open) as open_sum, SUM(Close) as close_sum \
-                FROM dax_in GROUP BY Date  ORDER BY Date")
+                FROM dax_in GROUP BY Date ORDER BY Date")
 dax.show()
 
 #add a column to store difference between open and close values 
@@ -82,9 +83,8 @@ dax_out.show()
 
 # write the results to hdfs
 #TODO file name
-#corona_out.write.format("csv").option("header", "true").mode("append").save(outputFileCorona)
-#dax_out.write.format("csv").option("header", "true").mode("append").save(outputFileDAX)
-
+corona_out.write.format("csv").option("header", "true").mode("append").save(outputFileCorona)
+dax_out.repartition(1).write.format("csv").option("header", "true").mode("append").save(outputFileDAX)
 
 #TODO results into mySQL DB
 
