@@ -1,0 +1,210 @@
+<html>
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Color theme for statusbar (Android only) -->
+    <meta name="theme-color" content="#2196f3">
+    <!-- Your app title -->
+    <title>Big Data</title>
+    <!-- Path to Framework7 Library Bundle CSS -->
+    <link rel="stylesheet" href="./Framework7/framework7.bundle.min.css">
+
+    <style>
+        .page-content {
+            padding-left: 50px;
+            padding-right: 50px;
+
+        }
+
+        #canvas {
+            width: 800px;
+            float: left;
+            padding: 50px;
+        }
+
+        #canvas>span {
+            font-weight: bold;
+            position: absolute;
+            top: 20px;
+        }
+
+        #canvasContainer {
+            height: 200px;
+            border: medium solid black;
+            border-top: none;
+        }
+
+        #zeitstrahl>span {
+            writing-mode: vertical-lr;
+            display: block;
+            line-height: 80px;
+            float: left;
+        }
+
+        #skalaDax,
+        #skalaCorona {
+            width: 40px;
+            height: 200px;
+            position: absolute;
+        }
+
+        #skalaDax>span,
+        #skalaCorona>span {
+            border-bottom: thin solid black;
+            line-height: 24px;
+            display: block;
+            position: absolute;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        #coronaMax {
+            top: 0px;
+            left: 0px;
+            padding-left: 5px;
+        }
+
+        #coronaMin {
+            bottom: 50px;
+            left: 0px;
+            padding-left: 5px;
+        }
+
+        #daxMax {
+            top: 0px;
+            right: 0px;
+        }
+
+        #daxMin {
+            bottom: 50px;
+            right: 0px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- App root element -->
+    <div id="app">
+
+        <!-- Your main view, should have "view-main" class -->
+        <div class="view view-main">
+            <!-- Initial Page, "data-name" contains page name -->
+            <div data-name="home" class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="center" style="padding-left: 20px;">Big Data Analyse - Kursveränderung im Verhältnis
+                            zur Corona Ausbreitung</div>
+                    </div>
+                </div>
+                <!-- Scrollable page content -->
+                <div class="page-content">
+
+                    <div class="card" style="width: 30%; float: left;">
+                        <form class="list" id="my-form">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Betrachtungszeitraum:</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" placeholder="Betrachtungszeitraum wählen"
+                                                    name="dateRange" readonly="readonly" id="calendar-range" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <a class="item-link smart-select smart-select-init" data-open-in="popover">
+                                        <select name="country" multiple>
+
+                                        </select>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Länder</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Relative Veränderung</div>
+                                            <div class="item-after">
+                                                <label class="toggle toggle-init toggleRelative">
+                                                    <input type="checkbox" name="toggleRelative" value="yes"><i
+                                                        class="toggle-icon"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                    <li>
+                                        <label class="item-radio item-radio-icon-start item-content">
+                                            <input type="radio" name="radio-coronaTyp" value="death" checked />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Todesfälle</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="item-radio item-radio-icon-start item-content">
+                                            <input type="radio" name="radio-coronaTyp" value="cases" />
+                                            <i class="icon icon-radio"></i>
+                                            <div class="item-inner">
+                                                <div class="item-title">Neuerkrankungen</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                            </ul>
+                        </form>
+                        <div class="block block-strong row">
+                            <div class="col"><a class="button convert-form-to-data" href="#">Abfrage starten</a></div>
+                        </div>
+                    </div>
+                    <div class="card" id="canvas">
+                        <span style="left: 15px; color: blue;">Aktienkurs</span>
+                        <span style="right: 25px; color: red;">Corona</span>
+                        <div id="skalaDax" style="left: 10px;">
+                            <span id="daxMax">11.000</span>
+                            <span id="daxMin">10.000</span>
+                        </div>
+                        <div id="skalaCorona" style="right: 10px;">
+                            <span id="coronaMax">11.000</span>
+                            <span id="coronaMin">10.000</span>
+                        </div>
+                        <div id="canvasContainer">
+                            <svg height="200px" width="800px">
+                                <path id="daxGraf" stroke-width="3" stroke="blue" fill="none"></path>
+                                <path id="coronaGraf" stroke-width="3" stroke="red" fill="none"></path>
+                            </svg>
+                        </div>
+                        <div id="zeitstrahl">
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                            <span>01.01.2020</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Path to Framework7 Library Bundle JS-->
+    <script type="text/javascript" src="./Framework7/framework7.bundle.min.js"></script>
+    <script type="text/javascript" src="./index.js"></script>
+    <script type="text/javascript" src="./test.js"></script>
+</body>
+
+</html>
