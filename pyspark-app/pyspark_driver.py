@@ -2,15 +2,20 @@ from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.functions import to_date, expr, current_date, date_sub, date_format
 from pyspark.sql.functions import sum
 
-# inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
-# inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
-inputInfections = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/infections.csv"
-inputDAX = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/quandl_fse.csv"
+inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
+inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
+# on Mac inputInfections = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/infections.csv"
+# on Mac inputDAX = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/quandl_fse.csv"
 
-# outputFileCorona = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/corona"
-# outputFileDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/dax"
-outputFileCorona = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/corona"
-outputFileDAX = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/dax"
+#inputInfections = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/python_hdfs/infections.csv"
+#inputDAX = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data//python_hdfs/quandl_fse.csv"
+
+outputFileCorona = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/corona"
+outputFileDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/dax"
+# on Mac outputFileCorona = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/corona"
+# on Mac outputFileDAX = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/dax"
+#outputFileCorona = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/pyspark-app/result/corona"
+#outputFileDAX = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/pyspark-app/result/dax"
 
 #create SparkSession
 spark = (SparkSession.
