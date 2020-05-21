@@ -10,14 +10,25 @@ const MemcachePlus = require('memcache-plus');
 let memcached = null
 let memcachedServers = []
 
+// Datenbank Konfiguration
 const dbConfig = {
 	user: 'root',
 	password: 'mysecretpw',
 	host: 'my-app-mysql-service',
 	port: 33060,
-	schema: 'mysqldb'
+	schema: 'sportsdb'
 };
 
+// Oberfläche einbinden
+app.use(express.static('surface'));
+var server = app.listen(8000, function () {
+	var host = server.address().address
+	var port = server.address().port
+	console.log('Express app listening at http://%s:%s', host, port)
+});
+
+
+// Aktualisieren der Memcached-Instancen (alle 5 sec)
 async function getMemcachedServersFromDns() {
 	let queryResult = await dns.lookup('my-memcache-service', { all: true })
 	let servers = queryResult.map(el => el.address + ":11211")
@@ -47,16 +58,16 @@ async function getFromCache(key) {
 }
 
 //Get data from database
-async function getFromDatabase(userid) {
-	let query = 'SELECT birth_date from persons WHERE person_key = "' + userid + '" LIMIT 1';
+async function getFromDatabase(query) {
 	let session = await mysqlx.getSession(dbConfig);
+	console.log("Executing query " + query);
 
-	console.log("Executing query " + query)
-	let res = await session.sql(query).execute()
-	let row = res.fetchOne()
+	let res = await session.sql(query).execute();
 
+	// TODO Hier wird das JSON erstellt
+	let row = res.fetchOne();
 	if (row) {
-		console.log("Query result = ", row)
+		console.log("Query result = ", row);
 		return row[0];
 	} else {
 		return null;
@@ -64,45 +75,45 @@ async function getFromDatabase(userid) {
 }
 
 function send_response(response, data) {
-	response.send(`<h1>Hello k8s! You are compex but not complexer than abacus hihihi</h1> 
-			<ul>
-				<li>Host ${os.hostname()}</li>
-				<li>Date: ${new Date()}</li>
-				<li>Memcached Servers: ${memcachedServers}</li>
-				<li>Result is: ${data}</li>
-			</ul>`);
+	
 }
 
-app.get('/', async function (request, response) {
-	response.writeHead(302, { 'Location': 'person/l.mlb.com-p.7491' })
-	response.end();
-})
+app.post('/serverAbfrageStarten/', function (req, res) {
+    if (req.method == 'POST') {
+        var body = '';
+        req.on('data', function (data) {
+            body += data;
+        });
+        req.on('end', function () {
+            runRequest(JSON.parse(body), res);
+        });
+    }
+});
 
-app.getAsync('/person/:id', async function (request, response) {
-	let userid = request.params["id"]
-	let key = 'user_' + userid
-	let cachedata = await getFromCache(key)
+app.get('/getCountrys/', function (req, res){
+    var country = ['Germany', 'Croatia', 'Austria', 'Italy', 'Switzerland'];
+    res.send(country);
+});
 
+
+async function runRequest(json, response) {
+	let sql = json.sql;
+	let cachedata = await getFromCache(sql);
 
 	if (cachedata) {
-		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`)
-		send_response(response, cachedata + " (cache hit)");
+		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`);
+		response.send(cachedata);
 	} else {
-		console.log(`Cache miss for key=${key}, querying database`)
-		let data = await getFromDatabase(userid)
+		console.log(`Cache miss for key=${key}, querying database`);
+		let data = await getFromDatabase(sql);
 		if (data) {
-			console.log(`Got data=${data}, storing in cache`)
+			console.log(`Got data=${data}, storing in cache`);
 			if (memcached)
-				await memcached.set(key, data, 30 /* seconds */);
-			send_response(response, data + " (cache miss)");
+				await memcached.set(sql, data, 30 /* seconds */);
+			send_response(response, data);
 		} else {
+			console.log(`No data found!`);
 			send_response(response, "No data found");
 		}
 	}
-})
-
-app.set('port', (process.env.PORT || 8080))
-
-app.listen(app.get('port'), function () {
-	console.log("Node app is running at localhost:" + app.get('port'))
-})
+};
