@@ -17,7 +17,7 @@ spark = (SparkSession.
             appName("pyspark_driver").
             getOrCreate())
 
-#spark.sparkContext.setLogLevel('WARN')
+spark.sparkContext.setLogLevel('WARN')
 
 #read infections info and return dataframe using an infered schema
 corona_in = spark.read.option("header", "true") \
@@ -25,18 +25,9 @@ corona_in = spark.read.option("header", "true") \
         .option("delimiter", ";") \
         .csv(inputInfections)
 
-#read DAX info and return dataframe using an infered schema
-dax_in = spark.read.option("header", "true") \
-        .option("inferSchema", "true") \
-        .option("delimiter", ";") \
-        .csv(inputDAX)
-
-
 #for debugging
 print(corona_in.printSchema())     
 corona_in.show(10)
-print(dax_in.printSchema())     
-dax_in.show(10)
 
 #select only necessary rows
 corona = corona_in.select(to_date('dateRep', format='dd/MM/yyyy').alias('date'), 
@@ -52,27 +43,47 @@ corona1 = corona.withColumn("prev_date", date_sub(corona.date, 1))
 corona1.createOrReplaceTempView("corona_out")
 corona1.show(10)
 
-corona_out1 = spark.sql("SELECT cor1.date, cor1.cases, cor1.deaths, cor1.prev_date, cor2.cases as cases_prev, cor2.deaths as dead_prev FROM corona_out as cor1  LEFT OUTER JOIN  corona_out as cor2 on cor2.date = cor1.prev_date and cor1.country=cor2.country")
+corona_out1 = spark.sql("SELECT cor1.date, cor1.cases, cor1.deaths, cor1.country, cor1.continent, \
+                        cor2.cases as cases_prev, cor2.deaths as dead_prev \
+                        FROM corona_out as cor1  \
+                        LEFT OUTER JOIN  corona_out as cor2 on cor2.date = cor1.prev_date and cor1.country=cor2.country")
 corona_out1.show(10)
 
-corona_out = corona_out1.withColumn("cases_rel_diff", expr("(cases-cases_prev)/cases_prev")).withColumn("deaths_rel_diff", expr("(deaths-dead_prev)/dead_prev"))
+corona_out = corona_out1.withColumn("cases_rel_diff", expr("(cases-cases_prev)/cases_prev"))\
+                        .withColumn("deaths_rel_diff", expr("(deaths-dead_prev)/dead_prev"))
 corona_out.show(10)
 
-#calculate DAX value as a total ammount of all stock values
-dax = dax_in.select(sum(dax_in.Open).alias('open_sum'), 
-                        sum(dax_in.Close).alias('close_sum'))
+#read DAX info and return dataframe using an infered schema
+dax_in = spark.read.option("header", "true") \
+        .option("inferSchema", "true") \
+        .option("delimiter", ";") \
+        .csv(inputDAX)
+
+print(dax_in.printSchema())     
+dax_in.show()
+
+#create dataframe with relevant fields and regester it as temporary view for querieng and transforming it
+dax_in1 = dax_in.select(dax_in['Date'].cast('date'), 
+                        dax_in.Share, dax_in.Open, dax_in.Close)
+dax_in1.createOrReplaceTempView("dax_in")
+dax_in1.show()
+
+#dax_in1.groupBy("Date").sum("Open").alias("open_sum").show()
+#calculate DAX value as a total ammount of all stock values for each date
+dax = spark.sql( "SELECT Date, SUM(Open) as open_sum, SUM(Close) as close_sum \
+                FROM dax_in GROUP BY Date  ORDER BY Date")
+dax.show()
 
 #add a column to store difference between open and close values 
-#add a date coulmn assuming the DAX values are from previous date
-dax_out = dax.withColumn("abs_diff", expr("close_sum - open_sum")).withColumn("date", date_sub(current_date(), 1))
+dax_out = dax.withColumn("abs_diff", expr("close_sum - open_sum"))
 
 #for debugging
 dax_out.show()
 
 # write the results to hdfs
 #TODO file name
-corona_out.write.format("csv").option("header", "true").mode("append").save(outputFileCorona)
-dax_out.write.format("csv").option("header", "true").mode("append").save(outputFileDAX)
+#corona_out.write.format("csv").option("header", "true").mode("append").save(outputFileCorona)
+#dax_out.write.format("csv").option("header", "true").mode("append").save(outputFileDAX)
 
 
 #TODO results into mySQL DB
