@@ -80,10 +80,32 @@ To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
 # This command returns the external web address of the service that's hosting the knox service for the webhdfs API
 minikube service knox-apache-knox-helm-svc --url
 ```
+## Spark on K8S
+### TODO: not fully working yet :/
+Put the pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
+```
+kubectl exec -ti my-hadoop-cluster-hadoop-yarn-rm-0 -- bash
 
-### TODO: put a pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
+hdfs dfs -mkdir -p app
+hdfs dfs -mkdir -p input/fse
+hdfs dfs -mkdir -p input/infections
+hdfs dfs -mkdir -p tmp
+hdfs dfs -mkdir -p tmp/results
+hdfs dfs -mkdir -p tmp/results/corona
+hdfs dfs -mkdir -p tmp/results/dax
 
-
+curl https://github.com/Thuridus/Big-Data/blob/develop/pyspark-app/pyspark_driver.py| hdfs dfs -put - app/
+Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/infections.csv| hdfs dfs -put - input/infections
+Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/quandl_fse.csv| hdfs dfs -put - input/fse
+```
+Get IP of kubernetes master 
+```
+kubectl cluster-info
+```
+Start Spark using IP of kubernetes master 
+```
+spark-submit --master k8s://https://{Kubernetes-master-IP:Port} --deploy-mode cluster --name pyspark_driver --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=csturm/spark-py:v2.4.4  hdfs://hadoop-hadoop-hdfs-nn:9000/app/pyspark_driver.py
+```
 
 ## Connection to the Database
 
