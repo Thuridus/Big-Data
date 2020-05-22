@@ -84,9 +84,10 @@ minikube service knox-apache-knox-helm-svc --url
 ### TODO: not fully working yet :/
 Put the pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
 ```
-kubectl exec -ti my-hadoop-cluster-hadoop-yarn-rm-0 -- bash
+kubectl exec -ti hadoop-hadoop-yarn-rm-0 -- bash
 
 hdfs dfs -mkdir -p app
+hdfs dfs -mkdir -p input
 hdfs dfs -mkdir -p input/fse
 hdfs dfs -mkdir -p input/infections
 hdfs dfs -mkdir -p tmp
