@@ -1,6 +1,6 @@
 # Big Data Platform :poop:
 
-Big Data Platform (PoC) to run a Corona App via Web. The aim of the project is to provide an correlative illustration between the index "Deutsche Aktien Index" (DAX) and the COVID-19 infections or deaths.
+Big Data Platform to run a Corona App via Web. The aim of the project is to provide an correlative illustration between the index "Deutsche Aktien Index" (DAX) and the COVID-19 infections or deaths.
 
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
@@ -35,6 +35,8 @@ Hier ist die Abbildung
 * Daten Covid werden alle 1h aktualisiert. (Datenquelle aktualisiert sich jedoch nur täglich)
 * Daten Börse werden alle 1h aktualisiert.
 * Apache Knox wird zur Interaktion mit Python verwendet.
+  * Apache Knox ist Schnittstelle (WEB) für HDFS
+  * Apache Spark besitzt eigene Schnittstelle.
 
 ### Kafka:
 * Messaging System zwischen Apache Spark und HDFS.
@@ -49,8 +51,12 @@ Hier ist die Abbildung
 ### Apache Spark:
 * Dient dem Data Processing der Daten aus HDFS
 * Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
-* ...
-* Apache Spark verarbeitet Daten (wie?)
+* Apache Spark greift auf HDFS Daten zu
+* Apache Spark verarbeitet Daten und sendet an die Datenbank
+  * Verarbeitung:
+  * Sortiert unnötige Daten aus
+  * Kalkuliert relative und absolute Veränderungen
+  * Summiert Aktienkurse auf DAX auf
 
 ### Database Server:
 * Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
