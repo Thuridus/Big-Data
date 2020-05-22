@@ -93,10 +93,12 @@ Hier ist die Abbildung
   * ...
 
 ### Cache Server:
-* ?
+* Wird ein Datumsbereich ausgewählt oder Daten irgendwas wird ein SQL Statement an Node JS gesendet. Daraus wird ein key erstellt (aus SQL) wenn der Key nicht vorhanden ist - dann wird SQL Statement auf DB ausgeführt Memcache gespeichert
+* JSON wird dann aus Memcache gezogen.
+* Speichert max Stunde, da Daten stündlich aktualisiert werden => Oder überhaupt relevant da in die Zukunft
 
 ### Load Balancer:
-* ? 
+* Ingress
 
 
  
