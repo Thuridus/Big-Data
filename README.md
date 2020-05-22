@@ -1,4 +1,4 @@
-# Big Data Platform :poop:
+# :fireworks: Big Data Platform :fireworks:
 
 Big Data Platform to run a Corona App via Web. The aim of the project is to provide an correlative illustration between the index "Deutsche Aktien Index" (DAX) and the COVID-19 infections or deaths.
 
