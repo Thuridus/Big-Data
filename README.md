@@ -5,7 +5,7 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
 
-## Big Data Architecture
+## Big Data Architecture :house:
 
 
 ### Grundsätzliche Architektur:
