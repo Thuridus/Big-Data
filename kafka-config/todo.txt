@@ -2,3 +2,4 @@ Kafka Subscriber:
 -> Dockerfile und Deployment.yml
 -> Webhdfs schreibt das Driver Programm in HDFS
 -> Macht den Spark Submit Befehl immer wenn er eine Kafka Nachricht bekommt
+-> Schreibt Ergebnis in MySql DB
