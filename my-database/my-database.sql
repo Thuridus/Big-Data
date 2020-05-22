@@ -6,8 +6,8 @@ CREATE Table `infects` (
     `deaths` int default NULL,
     `country` varchar(64) default NULL,
     `continent` varchar(64) default NULL,
-    `cases_prev` decimal(6,4) default NULL,
-    `dead_prev` decimal(6,4) default NULL,
+    `cases_prev` int default NULL,
+    `dead_prev` int default NULL,
     `cases_rel_diff` decimal(6,4) default NULL,
     `deaths_rel_diff` decimal(6,4) default NULL,
 PRIMARY KEY  (`date`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
