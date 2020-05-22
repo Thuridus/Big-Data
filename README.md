@@ -90,6 +90,9 @@ minikube start --driver=hyperv --memory 5120 --cpus 4
 
 #on Mac
 minikube start --vm-driver=hyperkit --memory 5120 --cpus 4
+
+#on Ubuntu
+minikube start --driver=none
 ```
 Pointing Docker daemon to minicube regestry
 ```
