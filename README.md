@@ -2,6 +2,69 @@
 
 Big Data Platform (PoC) to run a Corona App .... whatever
 
+
+#Big Data Architecture
+
+
+Grundsätzliche Idee und Architektur:
+* HDFS speicher Daten zu Börse und Covid
+* Über Kafka Cluster wird von HDFS eine msg an Appache Spark über neue Daten gesendet
+* Appache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
+* Appache Spark verarbeitet die Daten und sendet diese an den DB-Server
+* DB Server speichert die Daten in einer rationalen Datenbank
+* Web-Server ruft über Schnittstelle die Daten aus der rationalen Datenbank ab
+* Web-Frontend zeigt dem Nutzer Covid und Börsen Daten
+* Nutzer kann Betrachtungszeitraum einstellen
+* Details zu den Komponenten siehe unten
+
+Hier ist die Abbildung
+
+HDFS:
+* Daten aus Börse (Quelle Link) und Daten aus Covid (Quelle Link) werden gespeichert
+* Daten Covid werden alle X aktualisiert.
+* Daten Börse werden alle Y aktualisiert.
+* HDFS ist Kafka Producer: Sendet msg über Kafka Cluster an Appache Spark Consumer, wenn neue Daten verfügbar sind.
+
+Kafka:
+* Messaging System zwischen Appache Spark und HDFS.
+* Kafka Cluster wird über Helm hochgefahren (?).
+* Kafka Producer: HDFS
+* Kafka Consumer: Appache Spark
+* Topic: X
+* Replikation: Y
+* Bootstrap:
+* Mögliche Erweiterung:
+  * Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
+* ...
+
+Appache Spark:
+* Dient dem Data Processing der Daten aus HDFS
+* Wenn Appache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
+* ...
+* Appache Spark verarbeitet Daten (wie?)
+
+Database Server:
+* Rationale Datenbank speichert von Appache Kafka aufbereitete Daten.
+* Tabelle sieht so aus: ....
+
+Web Server: 
+* Frontend:
+  * Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
+  * Nutzer können Zeitraum auswählen in denen Korrelationen angezeigt werden
+* Backend:
+  * Daten werden aus DB gezogen (Was passiert genau?)
+  * ...
+
+
+Cache Server:
+* ?
+
+Load Balancer:
+* ? 
+
+
+ 
+
 ## TODO
 Description of idea, architecture, design and screenshots of demo  
 Licence for documentation (Creative Commons)
