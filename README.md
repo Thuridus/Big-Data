@@ -7,7 +7,7 @@ Check "Big Data Architecture" for further information about the functionality an
 
 ## Big Data Architecture :house:
 
-### Grundsätzliche Architektur:
+### Overview Architektur:
 * HDFS speichert Daten zu Börse (Frankfurt Stock Exchange) und Covid
   -> Daten werden von Standalone Python-Import-Pod zyklisch aktualisiert
 * Über Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
