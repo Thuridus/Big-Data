@@ -1,16 +1,18 @@
 # Big Data Platform :poop:
 
-Big Data Platform (PoC) to run a Corona App .... whatever
+Big Data Platform (PoC) to run a Corona App via Web. The aim of the project is to provide an correlative illustration between the index "Deutsche Aktien Index" (DAX) and the COVID-19 infections and death.
+
+Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
 
 ## Big Data Architecture
 
 
-### Grundsätzliche Idee und Architektur:
+### Grundsätzliche Architektur:
 * HDFS speicher Daten zu Börse und Covid
-* Über Kafka Cluster wird von HDFS eine msg an Appache Spark über neue Daten gesendet
-* Appache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
-* Appache Spark verarbeitet die Daten und sendet diese an den DB-Server
+* Über Kafka Cluster wird von HDFS eine msg an Apache Spark über neue Daten gesendet
+* Apache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
+* Apache Spark verarbeitet die Daten und sendet diese an den DB-Server
 * DB Server speichert die Daten in einer rationalen Datenbank
 * Web-Server ruft über Schnittstelle die Daten aus der rationalen Datenbank ab
 * Web-Frontend zeigt dem Nutzer Covid und Börsen Daten
@@ -23,13 +25,13 @@ Hier ist die Abbildung
 * Daten aus Börse (Quelle Link) und Daten aus Covid (Quelle Link) werden gespeichert
 * Daten Covid werden alle X aktualisiert.
 * Daten Börse werden alle Y aktualisiert.
-* HDFS ist Kafka Producer: Sendet msg über Kafka Cluster an Appache Spark Consumer, wenn neue Daten verfügbar sind.
+* HDFS ist Kafka Producer: Sendet msg über Kafka Cluster an Apache Spark Consumer, wenn neue Daten verfügbar sind.
 
 ### Kafka:
-* Messaging System zwischen Appache Spark und HDFS.
+* Messaging System zwischen Apache Spark und HDFS.
 * Kafka Cluster wird über Helm hochgefahren (?).
 * Kafka Producer: HDFS
-* Kafka Consumer: Appache Spark
+* Kafka Consumer: Apache Spark
 * Topic: X
 * Replikation: Y
 * Bootstrap:
@@ -37,14 +39,14 @@ Hier ist die Abbildung
   * Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
 * ...
 
-### Appache Spark:
+### Apache Spark:
 * Dient dem Data Processing der Daten aus HDFS
-* Wenn Appache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
+* Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
 * ...
-* Appache Spark verarbeitet Daten (wie?)
+* Apache Spark verarbeitet Daten (wie?)
 
 ### Database Server:
-* Rationale Datenbank speichert von Appache Kafka aufbereitete Daten.
+* Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
 * Tabelle sieht so aus: ....
 
 ### Web Server: 
