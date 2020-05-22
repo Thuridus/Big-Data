@@ -34,7 +34,7 @@ Hier ist die Abbildung
 * Daten aus Börse (link siehe Python-Import-Pod) und Daten aus Covid (link siehe Python-Import-Pod) werden gespeichert
 * Daten Covid werden alle 1h aktualisiert. (Datenquelle aktualisiert sich jedoch nur täglich)
 * Daten Börse werden alle 1h aktualisiert.
-* Apache Knox wird zur Interaktion mit Python Konsumenten verwendet.
+* Apache Knox wird zur Interaktion mit Python verwendet.
 
 ### Kafka:
 * Messaging System zwischen Apache Spark und HDFS.
