@@ -111,7 +111,7 @@ minikube -p minikube docker-env | Invoke-Expression
 eval $(minikube docker-env)
 ```
 
-## Deploy HDFS and Apache Spark on K8S:
+## Deploy HDFS on K8S:
 ### Deploying HDFS
 
 Add helm stable repo and 
@@ -136,7 +136,7 @@ helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
 helm install --set "knox.hadoop.nameNodeUrl=hdfs://hadoop-hadoop-hdfs-nn:9000/" --set "knox.hadoop.resourceManagerUrl=http://hadoop-hadoop-yarn-rm:8088/ws" --set "knox.hadoop.webHdfsUrl=http://hadoop-hadoop-hdfs-nn:50070/webhdfs/" --set "knox.hadoop.hdfsUIUrl=http://hadoop-hadoop-hdfs-nn:50070" --set "knox.hadoop.yarnUIUrl=http://hadoop-hadoop-yarn-ui:8088" --set "knox.servicetype=LoadBalancer" knox pfisterer-knox/apache-knox-helm
 ```
 
-## Deploy the periodic import pod
+## Deploy the periodic import pod on K8S:
 ### Create necessary docker image for Data import POD
 ```
 # After running the docker-env command, navigate to the python_hdfs directory (it contains one dockerfile)
@@ -155,7 +155,7 @@ To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
 minikube service knox-apache-knox-helm-svc --url
 ```
 
-## Starting Kafka Cluster
+## Deploy Kafka cluster on K8S:
 ### Install Strimzi operator
 Install strimzi operator via Helm
 ```
@@ -168,7 +168,7 @@ Navigate shell into 'kafka-config' folder
 kubectl apply -f kafka-cluster-def.yaml
 ```
 
-## Spark on K8S
+## Deploy Spark on K8S
 ### TODO: not fully working yet :/
 Put the pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
 ```
@@ -197,7 +197,7 @@ Start Spark using IP of kubernetes master
 spark-submit --master k8s://https://{Kubernetes-master-IP:Port} --deploy-mode cluster --name pyspark_driver --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=csturm/spark-py:v2.4.4  hdfs://hadoop-hadoop-hdfs-nn:9000/app/pyspark_driver.py
 ```
 
-## Connection to the Database
+## Deploy the database
 
 ### Create necessary POD
 
@@ -222,7 +222,7 @@ kubectl get pods -o wide
 kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
 ```
 
-### Create Connection to database
+### Test connection to database
 
 Build a connection to the database "my-database.sql" and get the entries
 ```
