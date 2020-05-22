@@ -95,6 +95,7 @@ hdfs dfs -mkdir -p tmp/results
 hdfs dfs -mkdir -p tmp/results/corona
 hdfs dfs -mkdir -p tmp/results/dax
 
+# not working, trying to find a workround
 curl https://github.com/Thuridus/Big-Data/blob/develop/pyspark-app/pyspark_driver.py| hdfs dfs -put - app/
 Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/infections.csv| hdfs dfs -put - input/infections
 Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/quandl_fse.csv| hdfs dfs -put - input/fse
