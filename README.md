@@ -4,27 +4,27 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
-## Unsere To-Do-Liste (wird später gelöscht)
-Unsere to-dos aus dem Pfisterer PDF
+## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
+Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
 
-- [ ] Komponente: Data-Lake (HDFS)
-- [ ] Komponente: Big Data Messaging (Kafka)
+- [X] Komponente: Data-Lake (HDFS)
+- [X] Komponente: Big Data Messaging (Kafka)
 - [ ] Komponente: Big Data Processing (Apache Spark)
-- [ ] Komponente: DB Server (mysql)
+- [X] Komponente: DB Server (mysql)
 - [ ] Komponente: Load Balancer (Ingress)
 - [ ] Komponente: Web Server
 - [ ] Komponente: Cache Server
-- [ ] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
+- [X] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
 - [ ] Das Ergebnis der Berechnungen im Big Data-System werden in der Datenbank gespeichert
 - [ ] Der Web Server liefert diese Ergebnisse aus
-- [ ] Optional: Daten aus der Webanwendung können in die Berechnung einfließen
-- [ ] Lizenz Quellcode (Apache)
-- [ ] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
+- [ ] Optional: Daten aus der Webanwendung können in die Berechnung einfließen => MAchen wir nicht
+- [X] Lizenz Quellcode (Apache)
+- [X] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
 - [ ] Dokumentation der Anwendung
 - [ ] Screencast
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
-- [ ] Grundsätzliche Idee der Anwendung erklären
+- [X] Grundsätzliche Idee der Anwendung erklären
 - [ ] Abgabe des Git Repository
 
 
@@ -93,10 +93,12 @@ Hier ist die Abbildung
   * ...
 
 ### Cache Server:
-* ?
+* Wird ein Datumsbereich ausgewählt oder Daten irgendwas wird ein SQL Statement an Node JS gesendet. Daraus wird ein key erstellt (aus SQL) wenn der Key nicht vorhanden ist - dann wird SQL Statement auf DB ausgeführt Memcache gespeichert
+* JSON wird dann aus Memcache gezogen.
+* Speichert max Stunde, da Daten stündlich aktualisiert werden => Oder überhaupt relevant da in die Zukunft
 
 ### Load Balancer:
-* ? 
+* Ingress
 
 
  
