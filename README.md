@@ -4,7 +4,7 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
-## Unsere To-Do-Liste (wird später gelöscht)
+## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
 Unsere to-dos aus dem Pfisterer PDF
 
 - [ ] Komponente: Data-Lake (HDFS)
