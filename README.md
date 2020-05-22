@@ -9,8 +9,9 @@ Check "Big Data Architecture" for further information about the functionality an
 
 
 ### Grundsätzliche Architektur:
-* HDFS speicher Daten zu Börse und Covid
-* Über Kafka Cluster wird von HDFS eine msg an Apache Spark über neue Daten gesendet
+* HDFS speichert Daten zu Börse (Frankfurt Stock Exchange) und Covid
+  -> Daten werden von Standalone Python-Import-Pod zyklisch aktualisiert
+* Über Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
 * Apache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
 * Apache Spark verarbeitet die Daten und sendet diese an den DB-Server
 * DB Server speichert die Daten in einer rationalen Datenbank
@@ -21,23 +22,29 @@ Check "Big Data Architecture" for further information about the functionality an
 
 Hier ist die Abbildung
 
+### Python-Import-Pod:
+* Importiert stündlich die neuesten Daten aus folgenden Quellen:
+  -> Frankfurt Stock Exchange: https://www.quandl.com/data/FSE-Frankfurt-Stock-Exchange
+  -> Infektionsdaten COVID-19: https://opendata.ecdc.europa.eu/covid19/casedistribution/json/
+* Daten werden im CSV-Format auf dem HDFS abgelegt
+* Nach Import wird über Kafka eine Benachrichtigung an den Spark Driver Pod gesendet. (Integration von Apache Hadoop als Kafka Producer zu aufwendig)
+* PyWebHDFS wird zur Interaktion mit dem HDFS verwendet.
+
 ### HDFS:
-* Daten aus Börse (Quelle Link) und Daten aus Covid (Quelle Link) werden gespeichert
-* Daten Covid werden alle X aktualisiert.
-* Daten Börse werden alle Y aktualisiert.
-* HDFS ist Kafka Producer: Sendet msg über Kafka Cluster an Apache Spark Consumer, wenn neue Daten verfügbar sind.
+* Daten aus Börse (link siehe Python-Import-Pod) und Daten aus Covid (link siehe Python-Import-Pod) werden gespeichert
+* Daten Covid werden alle 1h aktualisiert. (Datenquelle aktualisiert sich jedoch nur täglich)
+* Daten Börse werden alle 1h aktualisiert.
+* Apache Knox wird zur Interaktion mit Python Konsumenten verwendet.
 
 ### Kafka:
 * Messaging System zwischen Apache Spark und HDFS.
-* Kafka Cluster wird über Helm hochgefahren (?).
-* Kafka Producer: HDFS
-* Kafka Consumer: Apache Spark
-* Topic: X
-* Replikation: Y
-* Bootstrap:
+* Kafka Cluster wird über Helm hochgefahren. (Siehe: https://strimzi.io/charts/index.yaml)
+* Kafka Producer: Python-Import-Pod
+* Kafka Consumer: Spark-Driver-Pod
+* Topic: spark_notification
+* Replikation: 1
 * Mögliche Erweiterung:
-  * Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
-* ...
+  -> Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
 
 ### Apache Spark:
 * Dient dem Data Processing der Daten aus HDFS
@@ -147,6 +154,20 @@ To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
 # This command returns the external web address of the service that's hosting the knox service for the webhdfs API
 minikube service knox-apache-knox-helm-svc --url
 ```
+
+## Starting Kafka Cluster
+### Install Strimzi operator
+Install strimzi operator via Helm
+```
+helm repo add strimzi http://strimzi.io/charts/
+helm install kafka-operator strimzi/strimzi-kafka-operator
+```
+### Apply Kafka Cluster Deployment
+Navigate shell into 'kafka-config' folder
+```
+kubectl apply -f kafka-cluster-def.yaml
+```
+
 ## Spark on K8S
 ### TODO: not fully working yet :/
 Put the pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
