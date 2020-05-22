@@ -4,7 +4,7 @@ CREATE Table `infects` (
     `date` date NOT NUll,
     `cases` int default NULL,
     `deaths` int default NULL,
-    `country` varchar(64) default NULL,
+    `country` varchar(64) NOT NULL,
     `continent` varchar(64) default NULL,
     `cases_prev` int default NULL,
     `dead_prev` int default NULL,
