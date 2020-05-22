@@ -3,10 +3,10 @@
 Big Data Platform (PoC) to run a Corona App .... whatever
 
 
-#Big Data Architecture
+## Big Data Architecture
 
 
-Grundsätzliche Idee und Architektur:
+### Grundsätzliche Idee und Architektur:
 * HDFS speicher Daten zu Börse und Covid
 * Über Kafka Cluster wird von HDFS eine msg an Appache Spark über neue Daten gesendet
 * Appache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
@@ -19,13 +19,13 @@ Grundsätzliche Idee und Architektur:
 
 Hier ist die Abbildung
 
-HDFS:
+### HDFS:
 * Daten aus Börse (Quelle Link) und Daten aus Covid (Quelle Link) werden gespeichert
 * Daten Covid werden alle X aktualisiert.
 * Daten Börse werden alle Y aktualisiert.
 * HDFS ist Kafka Producer: Sendet msg über Kafka Cluster an Appache Spark Consumer, wenn neue Daten verfügbar sind.
 
-Kafka:
+### Kafka:
 * Messaging System zwischen Appache Spark und HDFS.
 * Kafka Cluster wird über Helm hochgefahren (?).
 * Kafka Producer: HDFS
@@ -37,17 +37,17 @@ Kafka:
   * Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
 * ...
 
-Appache Spark:
+### Appache Spark:
 * Dient dem Data Processing der Daten aus HDFS
 * Wenn Appache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
 * ...
 * Appache Spark verarbeitet Daten (wie?)
 
-Database Server:
+### Database Server:
 * Rationale Datenbank speichert von Appache Kafka aufbereitete Daten.
 * Tabelle sieht so aus: ....
 
-Web Server: 
+### Web Server: 
 * Frontend:
   * Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
   * Nutzer können Zeitraum auswählen in denen Korrelationen angezeigt werden
@@ -55,11 +55,10 @@ Web Server:
   * Daten werden aus DB gezogen (Was passiert genau?)
   * ...
 
-
-Cache Server:
+### Cache Server:
 * ?
 
-Load Balancer:
+### Load Balancer:
 * ? 
 
 
