@@ -4,6 +4,29 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
+## Unsere To-Do-Liste (wird später gelöscht)
+Unsere to-dos aus dem Pfisterer PDF
+
+- [ ] Komponente: Data-Lake (HDFS)
+- [ ] Komponente: Big Data Messaging (Kafka)
+- [ ] Komponente: Big Data Processing (Apache Spark)
+- [ ] Komponente: DB Server (mysql)
+- [ ] Komponente: Load Balancer (Ingress)
+- [ ] Komponente: Web Server
+- [ ] Komponente: Cache Server
+- [ ] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
+- [ ] Das Ergebnis der Berechnungen im Big Data-System werden in der Datenbank gespeichert
+- [ ] Der Web Server liefert diese Ergebnisse aus
+- [ ] Optional: Daten aus der Webanwendung können in die Berechnung einfließen
+- [ ] Lizenz Quellcode (Apache)
+- [ ] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
+- [ ] Dokumentation der Anwendung
+- [ ] Screencast
+- [ ] Dokumentation Architektur
+- [ ] Code kommentiert und formatiert und nachvollziehbar
+- [ ] Grundsätzliche Idee der Anwendung erklären
+- [ ] Abgabe des Git Repository
+
 
 ## Big Data Architecture :house:
 
