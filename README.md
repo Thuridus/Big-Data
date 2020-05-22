@@ -7,7 +7,6 @@ Check "Big Data Architecture" for further information about the functionality an
 
 ## Big Data Architecture :house:
 
-
 ### Grundsätzliche Architektur:
 * HDFS speichert Daten zu Börse (Frankfurt Stock Exchange) und Covid
   -> Daten werden von Standalone Python-Import-Pod zyklisch aktualisiert
