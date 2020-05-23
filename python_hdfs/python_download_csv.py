@@ -91,10 +91,13 @@ class HDFSImportJob:
         
         # Fetch JSON with HTTP-Request
         response = requests.get(self.infectionimporturl)
-        jsonresponse = response.json()["records"]
-        
+        # We need to access text property of response object to make the new encoding take affect
+        response.encoding = 'utf-8'
+        responsetext = response.text
+        jsonresponse = json.loads(responsetext, encoding='utf-8')
+                
         # Transform JSON to Dataframe
-        responsedf = pandas.json_normalize(jsonresponse)
+        responsedf = pandas.json_normalize(jsonresponse["records"])
 
         # Check if there is already a file existing and delete it
         if self.hdfsconnection.exists_file_dir(hdfs_export_filename):

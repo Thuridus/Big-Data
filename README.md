@@ -199,25 +199,13 @@ kubectl apply -f kafka-cluster-def.yaml
 ```
 
 ## Deploy Spark on K8S
-### TODO: not fully working yet :/
-Put the pyspark program into hdfs and run it with spark-submit using csturm/spark-py image
+### TODO: properly test
+Put the pyspark program into hdfs 
 ```
-kubectl exec -ti hadoop-hadoop-yarn-rm-0 -- bash
-
-hdfs dfs -mkdir -p app
-hdfs dfs -mkdir -p input
-hdfs dfs -mkdir -p input/fse
-hdfs dfs -mkdir -p input/infections
-hdfs dfs -mkdir -p tmp
-hdfs dfs -mkdir -p tmp/results
-hdfs dfs -mkdir -p tmp/results/corona
-hdfs dfs -mkdir -p tmp/results/dax
-
-# not working, trying to find a workround
-curl https://github.com/Thuridus/Big-Data/blob/develop/pyspark-app/pyspark_driver.py| hdfs dfs -put - app/
-Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/infections.csv| hdfs dfs -put - input/infections
-Curl https://github.com/Thuridus/Big-Data/blob/develop/python_hdfs/quandl_fse.csv| hdfs dfs -put - input/fse
+see "spark_to_hdfs.py" in kafka-config/ 
+consider to integrate it into subscriber  @Felix
 ```
+### Run pyspark_driver.py with spark-submit using csturm/spark-py image
 Get IP of kubernetes master 
 ```
 kubectl cluster-info
