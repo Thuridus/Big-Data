@@ -20,8 +20,8 @@ const dbConfig = {
 };
 
 // Oberfläche einbinden
-app.use(express.static('surface'));
-var server = app.listen(8000, function () {
+app.use(express.static('Interface'));
+var server = app.listen(8080, function () {
 	var host = server.address().address
 	var port = server.address().port
 	console.log('Express app listening at http://%s:%s', host, port)
@@ -30,7 +30,7 @@ var server = app.listen(8000, function () {
 
 // Aktualisieren der Memcached-Instancen (alle 5 sec)
 async function getMemcachedServersFromDns() {
-	let queryResult = await dns.lookup('my-memcache-service', { all: true })
+	let queryResult = await dns.lookup('my-memcached-service', { all: true })
 	let servers = queryResult.map(el => el.address + ":11211")
 
 	//Only create a new object if the server list has changed
@@ -46,7 +46,7 @@ async function getMemcachedServersFromDns() {
 
 //Initially try to connect to the memcached servers, then each 5s update the list
 getMemcachedServersFromDns()
-setInterval(() => getMemcachedServersFromDns(), 5000)
+//setInterval(() => getMemcachedServersFromDns(), 5000)
 
 //Get data from cache if a cache exists yet
 async function getFromCache(key) {
