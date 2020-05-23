@@ -2,15 +2,15 @@ from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.functions import to_date, expr, current_date, date_sub, date_format
 from pyspark.sql.functions import sum
 
-inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
-inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
-#inputInfections = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/python_hdfs/infections.csv"
-#inputDAX = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data//python_hdfs/quandl_fse.csv"
+#inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections/infections.csv"
+#inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/fse/quandl_fse.csv"
+inputInfections = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/infections.csv"
+inputDAX = "/Users/shabaldinalidiia/git/Big-Data/python_hdfs/quandl_fse.csv"
 
-outputFileCorona = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/corona"
-outputFileDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/dax"
-#outputFileCorona = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/pyspark-app/result/corona"
-#outputFileDAX = "/c/Users/Lidiia.Shabaldina/Master/BigData20/Big-Data/pyspark-app/result/dax"
+#outputFileCorona = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/corona"
+#outputFileDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/tmp/results/dax"
+outputFileCorona = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/corona"
+outputFileDAX = "/Users/shabaldinalidiia/git/Big-Data/pyspark-app/result/dax"
 
 #create SparkSession
 spark = (SparkSession.
@@ -35,10 +35,13 @@ corona = corona_in.select(to_date('dateRep', format='dd/MM/yyyy').alias('date'),
                             corona_in.cases,
                             corona_in.deaths,
                             corona_in.countriesAndTerritories.alias('country'),
-                            corona_in.continentExp.alias('continent'),)
-                            
+                            corona_in.continentExp.alias('continent'))
+
+corona0 = corona.filter(corona.continent == "Europe")
+corona0.show(50)
+
 #calculate relative difference to previous day for number of cases and death
-corona1 = corona.withColumn("prev_date", date_sub(corona.date, 1))
+corona1 = corona0.withColumn("prev_date", date_sub(corona.date, 1))
 
 #regester dataframe as temporary view for querieng and transforming it
 corona1.createOrReplaceTempView("corona_out")
@@ -47,7 +50,7 @@ corona1.show(10)
 corona_out1 = spark.sql("SELECT cor1.date, cor1.cases, cor1.deaths, cor1.country, cor1.continent, \
                         cor2.cases as cases_prev, cor2.deaths as dead_prev \
                         FROM corona_out as cor1  \
-                        LEFT OUTER JOIN  corona_out as cor2 on cor2.date = cor1.prev_date and cor1.country=cor2.country")
+                        LEFT OUTER JOIN  corona_out as cor2 on cor2.date = cor1.prev_date and cor1.country=cor2.country ")
 
 corona_out = corona_out1.withColumn("cases_rel_diff", expr("(cases-cases_prev)/cases_prev"))\
                         .withColumn("deaths_rel_diff", expr("(deaths-dead_prev)/dead_prev"))
@@ -82,11 +85,8 @@ dax_out = dax.withColumn("abs_diff", expr("close_sum - open_sum"))
 dax_out.show()
 
 # write the results to hdfs
-#TODO file name
 corona_out.write.format("csv").option("header", "true").mode("append").save(outputFileCorona)
 dax_out.repartition(1).write.format("csv").option("header", "true").mode("append").save(outputFileDAX)
-
-#TODO results into mySQL DB
 
 #close SparkSession
 spark.stop()
