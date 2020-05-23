@@ -279,5 +279,5 @@ docker build -t interface .
 
 Run Docker-Image
 ```
-docker run -p 8080:8080 interfaces
+docker run -p 8080:8080 interface
 ```
