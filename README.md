@@ -270,3 +270,14 @@ Check if service is running on minikube
 ```
 minikube dashboard
 ```
+
+Navigate to /app/
+Build Interface-Dockerfile
+```
+docker build -t interface .
+```
+
+Run Docker-Image
+```
+docker run -p 8080:8080 interfaces
+```
