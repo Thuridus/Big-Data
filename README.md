@@ -34,9 +34,9 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 * HDFS speichert Daten zu Börse (Frankfurt Stock Exchange) und Covid
   -> Daten werden von Standalone Python-Import-Pod zyklisch aktualisiert
 * Über Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
-* Apache Spark fordert Daten von HDFS an (?) über Schnittstelle (?)
+* Apache Spark Programm, sowie die Daten sind im HDFS Cluster abgelegt
 * Apache Spark verarbeitet die Daten und sendet diese an den DB-Server
-* DB Server speichert die Daten in einer rationalen Datenbank
+* DB Server speichert die Daten in einer MySql relationalen Datenbank
 * Web-Server ruft über Schnittstelle die Daten aus der rationalen Datenbank ab
 * Web-Frontend zeigt dem Nutzer Covid und Börsen Daten
 * Nutzer kann Betrachtungszeitraum einstellen
