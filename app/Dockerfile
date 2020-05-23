@@ -5,13 +5,16 @@ FROM node:10-alpine
 WORKDIR /src/
 
 COPY package.json /src/
+COPY package-lock.json /src/
 RUN npm install
 
 # Copy web-server index.js into image
-COPY index.js /src/
+COPY webapp.js /src/
+# Copy web-interface into image
+COPY Interface /src/
 
 # Expose internal docker port on 8080
 EXPOSE 8080
 
 # Run app with 
-CMD ["node", "index.js"]
+CMD ["node", "webapp.js"]

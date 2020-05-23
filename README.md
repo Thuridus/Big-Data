@@ -258,4 +258,15 @@ Select * from infects;
 exit
 ```
 
+### Test Interface
 
+Navigate to my-database and run *.yml-files
+```
+kubectl apply -f my-mysql-deployment.yml
+kubectl apply -f my-memcache-deployment.yml
+```
+
+Check if service is running on minikube
+```
+minikube dashboard
+```
