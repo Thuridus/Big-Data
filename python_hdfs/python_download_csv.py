@@ -98,6 +98,8 @@ class HDFSImportJob:
                 
         # Transform JSON to Dataframe
         responsedf = pandas.json_normalize(jsonresponse["records"])
+        # Remove this countries because its causing encoding issues with pywebhdfs
+        responsedf = responsedf[responsedf.countriesAndTerritories != 'Curaçao']
 
         # Check if there is already a file existing and delete it
         if self.hdfsconnection.exists_file_dir(hdfs_export_filename):
