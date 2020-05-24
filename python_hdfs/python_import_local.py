@@ -29,11 +29,22 @@ def import_fse(quandl_companies_list, quandl_start_date, quandl_end_date, hdfs_e
 
 def import_infections(import_url, hdfs_path_infection):
     response = requests.get(import_url)
-    jsonresponse = response.json()["records"]
-    hdfs_export_filename = hdfs_path_infection + "/infections.cvs"
+    response.encoding = 'utf-8'
+    responsetext = response.text
 
-    responsedf = pandas.json_normalize(jsonresponse)
+    jsonresponse = json.loads(responsetext, encoding='utf-8')
+    #jsonresponse = json.load(responsetext.encode())["records"]
+    
+    #json.dump(jsonresponse, file, ensure_ascii=False)
+    
+    #hdfs_export_filename = hdfs_path_infection + "/infections.cvs"
 
+    responsedf = pandas.json_normalize(jsonresponse["records"])
+    print(responsedf)
+    responsedf = responsedf[responsedf.countriesAndTerritories != 'Curaçao']
+    file = open("/root/Desktop/github_repo/python_hdfs/infectionsjson.txt", 'w+')
+    file.write(responsedf.to_csv(sep=";",index=False, line_terminator='\n'))
+    file.close()
     #if hdfs_connection.exists_file_dir(hdfs_export_filename):
     #    hdfs_connection.delete_file_dir(hdfs_export_filename)
     
@@ -75,7 +86,7 @@ foundFSE = False
 
 #if foundInfections and foundFSE:
 while True:
-    import_fse(quandl_companies, startdate, enddate, fse_file_path)
-    #import_infections(infection_import_url, infection_file_path)
+    #import_fse(quandl_companies, startdate, enddate, fse_file_path)
+    import_infections(infection_import_url, infection_file_path)
     print("import process finished successfully! Next import will be in 1 hour")
     time.sleep(3600)
