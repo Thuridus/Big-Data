@@ -24,16 +24,16 @@ class SparkDriverJob:
         thread.start()   
         
     def run(self):
-        self.StartSparkExecution()
-        self.ExportResultToDB()
-        self.ValidateExport()
+        #self.StartSparkExecution()
+        #self.ExportResultToDB()
+        #self.ValidateExport()
 
-        #for msg in self.kafkaproducer:
-        #    print("Message Received: ", msg)
-        #    message = str(msg.value.decode())
-        #    if message == 'new_data_available':
-        #        print("Received import notification from import pod. Starting Spark execution.")
-        #        self.StartSparkExecution()   
+        for msg in self.kafkaproducer:
+            print("Message Received: ", msg)
+            message = str(msg.value.decode())
+            if message == 'new_data_available':
+                print("Received import notification from import pod. Starting Spark execution.")
+                #self.StartSparkExecution()   
 
     # Is called whenever a spark execution has to be started
     def StartSparkExecution(self):
@@ -87,16 +87,16 @@ hdfsconn = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{hdfsweburl}/web
                                          request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
 
 # Debug preparation code
-hdfsconn.make_dir("/tmp/results")
-dataframecovid = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/corona/part-00000-c5db4887-e907-453b-b95e-753eb8d81c40-c000.csv", index_col='date', keep_default_na=False, encoding='utf-8')
-print(dataframecovid)
-csvdata = dataframecovid.to_csv(sep=",",index=True, line_terminator='\n', encoding='utf-8')
-hdfsconn.delete_file_dir("/tmp/results/corona.csv")
-hdfsconn.create_file("/tmp/results/corona.csv", csvdata, permission=777)
+#hdfsconn.make_dir("/tmp/results")
+#dataframecovid = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/corona/part-00000-c5db4887-e907-453b-b95e-753eb8d81c40-c000.csv", index_col='date', keep_default_na=False, encoding='utf-8')
+#print(dataframecovid)
+#csvdata = dataframecovid.to_csv(sep=",",index=True, line_terminator='\n', encoding='utf-8')
+#hdfsconn.delete_file_dir("/tmp/results/corona.csv")
+#hdfsconn.create_file("/tmp/results/corona.csv", csvdata, permission=777)
 
-hdfsconn.delete_file_dir("/tmp/results/dax.csv")
-dataframedax = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/dax/part-00000-1a7de9b8-84a2-4682-8950-483587a10c67-c000.csv", index_col='Date', keep_default_na=False, encoding='utf-8')
-hdfsconn.create_file("/tmp/results/dax.csv", dataframedax.to_csv(sep=",", index=True, line_terminator="\n"), permission=777)
+#hdfsconn.delete_file_dir("/tmp/results/dax.csv")
+#dataframedax = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/dax/part-00000-1a7de9b8-84a2-4682-8950-483587a10c67-c000.csv", index_col='Date', keep_default_na=False, encoding='utf-8')
+#hdfsconn.create_file("/tmp/results/dax.csv", dataframedax.to_csv(sep=",", index=True, line_terminator="\n"), permission=777)
 
 with open('/root/Desktop/github_repo/pyspark-app/pyspark_driver.py', 'r') as file:
     hdfsconn.make_dir("/app")
@@ -106,12 +106,12 @@ with open('/root/Desktop/github_repo/pyspark-app/pyspark_driver.py', 'r') as fil
 
 
 # Clear DB
-dbtest = mysql.connector.connect(host='10.0.2.15', port='30813', user='root', password='mysecretpw', database='mysqldb', auth_plugin='mysql_native_password')
-dbcursor = dbtest.cursor()
-dbcursor.execute('DELETE FROM infects')
-dbcursor.execute('DELETE FROM dax')
-dbcursor.close()
-dbtest.close()
+#dbtest = mysql.connector.connect(host='10.0.2.15', port='30813', user='root', password='mysecretpw', database='mysqldb', auth_plugin='mysql_native_password')
+#dbcursor = dbtest.cursor()
+#dbcursor.execute('DELETE FROM infects')
+#dbcursor.execute('DELETE FROM dax')
+#dbcursor.close()
+#dbtest.close()
 
 
 
