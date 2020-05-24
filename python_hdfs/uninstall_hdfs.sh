@@ -1,3 +1,4 @@
+#!/bin/bash
 # uninstall knox
 helm uninstall knox
 # uninstall hadoop
