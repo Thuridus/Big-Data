@@ -2,9 +2,9 @@
   "name": "nodejs-dokku-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "webapp.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node webapp.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "@awaitjs/express": "^0.4.0",
     "@mysql/xdevapi": "^8.0.20",
     "express": "^4.17.1",
+    "framework7": "^5.7.5",
     "memcache-plus": "^0.2.21"
   }
 }

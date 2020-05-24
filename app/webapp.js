@@ -27,10 +27,16 @@ var server = app.listen(8080, function () {
 	console.log('Express app listening at http://%s:%s', host, port)
 });
 
-
+/*
+console.log("Start lookup");
+dns.lookup('google.com', {all: true}, function(err, addresses){
+	if(err) console.log(err);
+	console.log('addresses: %j', addresses);
+});
+*/
 // Aktualisieren der Memcached-Instancen (alle 5 sec)
-async function getMemcachedServersFromDns() {
-	let queryResult = await dns.lookup('my-memcached-service', { all: true })
+async function getMemcachedServersFromDns() {	
+	let queryResult = await dns.lookup('my-memcached-service', { all: true });
 	let servers = queryResult.map(el => el.address + ":11211")
 
 	//Only create a new object if the server list has changed
@@ -45,7 +51,7 @@ async function getMemcachedServersFromDns() {
 }
 
 //Initially try to connect to the memcached servers, then each 5s update the list
-getMemcachedServersFromDns()
+//getMemcachedServersFromDns()
 //setInterval(() => getMemcachedServersFromDns(), 5000)
 
 //Get data from cache if a cache exists yet

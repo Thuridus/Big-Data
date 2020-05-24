@@ -25,6 +25,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
 - [X] Grundsätzliche Idee der Anwendung erklären
+- [ ] Repo aufräumen
 - [ ] Abgabe des Git Repository
 
 
@@ -272,7 +273,7 @@ minikube dashboard
 ```
 
 Navigate to /app/
-Build Interface-Dockerfile
+Build Interface-Dockerfile and run interface-deployment
 ```
 docker build -t interface .
 ```
