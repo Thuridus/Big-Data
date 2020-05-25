@@ -32,73 +32,71 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 ## Big Data Architecture :house:
 
 ### Overview Architektur:
-* HDFS speichert Daten zu Börse (Frankfurt Stock Exchange) und Covid
-  -> Daten werden von Standalone Python-Import-Pod zyklisch aktualisiert
-* Über Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
-* Apache Spark Programm, sowie die Daten sind im HDFS Cluster abgelegt
-* Apache Spark verarbeitet die Daten und sendet diese an den DB-Server
-* DB Server speichert die Daten in einer MySql relationalen Datenbank
-* Web-Server ruft über Schnittstelle die Daten aus der rationalen Datenbank ab
-* Web-Frontend zeigt dem Nutzer Covid und Börsen Daten
-* Nutzer kann Betrachtungszeitraum einstellen
-* Details zu den Komponenten siehe unten
+* HDFS speichert Daten zur Börse (Frankfurt Stock Exchange) und Covid-19 (Ansteckungen und Verstorbene pro Tag)
+* Die Daten werden durch einen Standalone Python-Import-Pod zyklisch aktualisiert
+* Über das Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
+* Apache Spark greift daraufhin auf die Daten im HDFS Cluster zu
+* Apache Spark verarbeitet die Daten und sendet diese an den Datenbank-Server
+* Der Datenbank-Server speichert die Daten in einer MySQL-DB
+* Der Web-Server ruft über eine Schnittstelle zur MySQL-DB die Daten ab
+* Das Web-Frontend zeigt dem Nutzer die Daten in einer grafischen Darstellung
+* Der Nutzer kann verschieden Parameter ändern, die zu einem entsprechenden Abruf bei der MySQL-DB führt
+* Bevor ein Abruf der Daten bei der MySQL-DB erfolgt, wird geprüft, ob das SQL-Statement bereits in Memchached verfügbar ist
+* Für weitere Details zu den Komponenten siehe unten
 
-Hier ist die Abbildung
+![](images/architecture.png)
 
 ### Python-Import-Pod:
 * Importiert stündlich die neuesten Daten aus folgenden Quellen:
-  -> Frankfurt Stock Exchange: https://www.quandl.com/data/FSE-Frankfurt-Stock-Exchange
-  -> Infektionsdaten COVID-19: https://opendata.ecdc.europa.eu/covid19/casedistribution/json/
+  * Frankfurt Stock Exchange: https://www.quandl.com/data/FSE-Frankfurt-Stock-Exchange
+  * Infektionsdaten COVID-19: https://opendata.ecdc.europa.eu/covid19/casedistribution/json/
 * Daten werden im CSV-Format auf dem HDFS abgelegt
-* Nach Import wird über Kafka eine Benachrichtigung an den Spark Driver Pod gesendet. (Integration von Apache Hadoop als Kafka Producer zu aufwendig)
-* PyWebHDFS wird zur Interaktion mit dem HDFS verwendet.
+* Nach Import wird über Kafka eine Benachrichtigung an den Spark Driver Pod gesendet. *(Anmerkung: Integration von Apache Hadoop als Kafka Producer zu aufwendig)*
+* PyWebHDFS wird zur Interaktion mit dem HDFS verwendet
 
-### HDFS:
-* Daten aus Börse (link siehe Python-Import-Pod) und Daten aus Covid (link siehe Python-Import-Pod) werden gespeichert
-* Daten Covid werden alle 1h aktualisiert. (Datenquelle aktualisiert sich jedoch nur täglich)
+### Data Lake (HDFS):
+* Daten aus Börse (link siehe Python-Import-Pod) und Daten aus Covid (link siehe Python-Import-Pod) werden als CSV gespeichert
+* Daten Covid werden alle 1h aktualisiert. *(Anmerkung: Datenquelle aktualisiert sich jedoch nur täglich)*
 * Daten Börse werden alle 1h aktualisiert.
-* Apache Knox wird zur Interaktion mit Python verwendet.
+* (?) Apache Knox wird zur Interaktion mit Python (?) verwendet:
   * Apache Knox ist Schnittstelle (WEB) für HDFS
-  * Apache Spark besitzt eigene Schnittstelle.
+  * Apache Spark besitzt eigene Schnittstelle
 
-### Kafka:
-* Messaging System zwischen Apache Spark und HDFS.
-* Kafka Cluster wird über Helm hochgefahren. (Siehe: https://strimzi.io/charts/index.yaml)
+### Big Data Messaging (Kafka Cluster):
+* Messaging System zwischen Apache Spark und HDFS
+* Kafka Cluster wird über Helm hochgefahren (siehe: https://strimzi.io/charts/index.yaml)
 * Kafka Producer: Python-Import-Pod
 * Kafka Consumer: Spark-Driver-Pod
 * Topic: spark_notification
-* Replikation: 1
-* Mögliche Erweiterung:
-  -> Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
+* Replikation: 1 *(Anmerkung: Es werden grds. 3 bis 5 broker in einem Kafka Cluster für eine hohe Verfügbarkeit und einen schnellen Durchlauf empfohlen)*
+* Mögliche Erweiterung: Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
 
-### Apache Spark:
+### Big Data&Science Processing (Apache Spark):
 * Dient dem Data Processing der Daten aus HDFS
-* Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann (Was passiert dann?)
-* Apache Spark greift auf HDFS Daten zu
-* Apache Spark verarbeitet Daten und sendet an die Datenbank
-  * Verarbeitung:
-  * Sortiert unnötige Daten aus
-  * Kalkuliert relative und absolute Veränderungen
-  * Summiert Aktienkurse auf DAX auf
+* Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann greift Apache Spark auf die Daten in HDFS zu
+* Apache Spark verarbeitet die Daten und sendet an die Datenbank
+* Bevor die Daten an die MySQL-DB gesendet werden, werden die Daten vorbereitet:
+  * Unnötige Daten werden aussortiert
+  * Aktienkurse werden zu DAX aufsummiert
+  * Absolute und relative Veränderungen zwischen den Tagen werden kalkuliert
 
-### Database Server:
+### Datenbank (MySQL-Datenbank):
 * Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
 * Tabelle sieht so aus: ....
 
-### Web Server: 
-* Frontend:
-  * Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
-  * Nutzer können Zeitraum auswählen in denen Korrelationen angezeigt werden
-* Backend:
-  * Daten werden aus DB gezogen (Was passiert genau?)
-  * ...
+### Web Server (Node.js): 
+* Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
+* Nutzer können Parameter einstellen, die zu einer SQL-Abfrage bei der MySQL-Datenbank führen
+* In Memcached werden die bisherigen SQL-Abfragen gespeichert (siehe dazu Memcached)
+* Web Server prüft die Verfügbarkeit im Cache bevor er eine SQL-Abfrage bei der MySQL-Dantenbank durchführt (siehe dazu Memcached)
 
-### Cache Server:
-* Wird ein Datumsbereich ausgewählt oder Daten irgendwas wird ein SQL Statement an Node JS gesendet. Daraus wird ein key erstellt (aus SQL) wenn der Key nicht vorhanden ist - dann wird SQL Statement auf DB ausgeführt Memcache gespeichert
-* JSON wird dann aus Memcache gezogen.
-* Speichert max Stunde, da Daten stündlich aktualisiert werden => Oder überhaupt relevant da in die Zukunft
+### Cache-Server (Memcached):
+* Aus den SQL-Abfragen des Web Servers an den MySQL-Server wird ein Key erstellt und in Memchached abgelegt
+* Wenn ein Key nicht vorhanden ist wird die SQL-Abfrage an den MySQL-Server gesendet und in Memcached als Key abgelegt
+* In Memcached wird neben dem Key das jeweilige Ergebnis der Abfrage gespeichert
+* In Memcached werden Daten maximal X Minuten gespeichert
 
-### Load Balancer:
+### Load Balancer (Ingress):
 * Ingress
 
 ## Funktionsweise der Benutzeroberfläche
