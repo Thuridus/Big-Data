@@ -43,7 +43,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 * Nutzer kann Betrachtungszeitraum einstellen
 * Details zu den Komponenten siehe unten
 
-Hier ist die Abbildung
+![](images/architecture.png)
 
 ### Python-Import-Pod:
 * Importiert stündlich die neuesten Daten aus folgenden Quellen:
