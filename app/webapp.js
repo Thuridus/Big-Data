@@ -5,6 +5,7 @@ const { addAsync } = require('@awaitjs/express');
 const app = addAsync(express());
 const mysqlx = require('@mysql/xdevapi');
 const MemcachePlus = require('memcache-plus');
+const router = express.Router();
 
 //Connect to the memcached instances
 let memcached = null
@@ -20,7 +21,14 @@ const dbConfig = {
 };
 
 // Oberfläche einbinden
-app.use(express.static('Interface'));
+router.get('/', function(req,res){
+	res.sendFile('/src/index.html');
+});
+app.use(express.static(__dirname));
+app.use('/', router);
+
+console.log("Dirname: " + __dirname);
+
 var server = app.listen(8080, function () {
 	var host = server.address().address
 	var port = server.address().port

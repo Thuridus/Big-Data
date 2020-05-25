@@ -101,6 +101,25 @@ Hier ist die Abbildung
 ### Load Balancer:
 * Ingress
 
+## Funktionsweise der Benutzeroberfläche
+Die Benutzeroberfläche entspricht dem Endpunkt der Architektur, über welchen der Enduser in der Regel Daten der Anwendung abfragt. Hierzu kann nach dem Start der unterschiedlichen Architekturkomponenten (min. nach dem Start des Webservers (webapp.js)) die Adresse localhost:8080 über einen beliebigen Internetbrowser aufgerufen werden.
+### Anwendungslogik der Oberfläche
+Die Anwendungslogik validiert und Verarbeitet die jeweiligen Nutzeranfragen und aktualisert die auf der Oberfläche angezeigten Grafen. Bei den Parametern der Nutzeranfrage werden folgende unterschieden:
+#### Auswahl eines Datumbereichs
+Es muss in jedem Fall ein Datumsbereich ausgwählt werden. Je nach größe des Bereichs wird der Graf auf Monate, Kalenderwochen oder Tage skaliert.
+* Monate: Datumsrange größer 4 Monate
+* Wochen: Datumsrange zwischen 4 Wochen und 4 Monaten
+* Tage: Datumsrange kleiner 28 Tage (4 Wochen) 
+#### Auswahl der Betrachtungsländer
+Unter Verwendung einer Checkbox-Liste können die Länder ausgewählt werden, deren Coronadaten für den Vergleich herangezogen werden sollen. Das Land "Deutschland" ist standardmäßig ausgewählt
+#### Relative Veränderung zum Vortag
+Bei den Coronadaten können wahlweise entweder die tatsächliche Tagesveränderung (Neuerkrankungen bzw. Todesfälle) oder die relative Veränderung zum Vortag angezeigt werden.
+#### Art der Coronadaten
+Bei der Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
+
+
+
+
 
  
 
