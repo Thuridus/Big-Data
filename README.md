@@ -217,20 +217,45 @@ kubectl apply -f kafka-cluster-def.yaml
 ```
 
 ## Deploy Spark on K8S
-### TODO: properly test
-Put the pyspark program into hdfs 
+
+The pyspark app is put into hdfs /app/ 
+
+### Spark Operator in separate workspace
+Create a namespace with the name ‘spark-operator’
 ```
-see "spark_to_hdfs.py" in kafka-config/ 
-consider to integrate it into subscriber  @Felix
+#navigate to the folder "pyspark-app"
+kubectl create -f namespaces-spark.yml
+
+#create a service account with the name ‘spark’
+kubectl create serviceaccount spark --namespace=default
+
+#create RBAC role for svc spar
+kubectl create clusterrolebinding spark-operator-role --clusterrole=cluster-admin --serviceaccount=default:spark --namespace=default
+
+#install helm repo
+helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+
+helm install spark incubator/sparkoperator --namespace spark-operator --set sparkJobNamespace=default
 ```
+
 ### Run pyspark_driver.py with spark-submit using csturm/spark-py image
+
+### 2 Oprions - both not working :D
+Option 1:
+```
+#navigate to the folder "pyspark-app"
+kubectl apply -f pyspark.yml
+kubectl apply -f spark-schedule.yml
+```
+
+Option 2:
 Get IP of kubernetes master 
 ```
 kubectl cluster-info
 ```
 Start Spark using IP of kubernetes master 
 ```
-spark-submit --master k8s://https://{Kubernetes-master-IP:Port} --deploy-mode cluster --name pyspark_driver --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=csturm/spark-py:v2.4.4  hdfs://hadoop-hadoop-hdfs-nn:9000/app/pyspark_driver.py
+spark-submit --master k8s://https://{Kubernetes-master-IP:Port} --deploy-mode cluster --name pyspark_driver --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=csturm/spark-py:v2.4.4  {path to the file}/pyspark_driver.py
 ```
 
 ## Deploy the database
