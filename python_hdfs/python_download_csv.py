@@ -87,7 +87,7 @@ class HDFSImportJob:
     # Import newest infection statistics for COVID-19 from ECDC via Web API
     def import_infections(self):
         # Define hdfs path of result file
-        hdfs_export_filename = self.infectionhdfsexportpath + "/infections.cvs"
+        hdfs_export_filename = self.infectionhdfsexportpath + "/infections.csv"
         
         # Fetch JSON with HTTP-Request
         response = requests.get(self.infectionimporturl)
@@ -132,32 +132,16 @@ hdfsconn = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{hdfsweburl}/web
                                          request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
 
 # Base paths for the result data
-infection_file_path = "/user/root/input/infections"
-fse_file_path = "/user/root/input/fse"
+infection_file_path = "/input/"
+fse_file_path = "/input/"
 
-# Create the base directories
-hdfsconn.make_dir("/user/root/input", permission=777)
-hdfsconn.make_dir("/user/root/input/infections", permission=777)
-hdfsconn.make_dir("/user/root/input/fse", permission=777)
- 
-# Check if the directories actually were created
-foundInfections = False
-foundFSE = False
-root_dir = hdfsconn.list_dir("/user/root/input")
-if len(root_dir) > 0:
-    for dir in root_dir.values():
-        for dir2 in dir.values():
-            for dir3 in dir2:
-                if dir3["pathSuffix"] == "infections":
-                    foundInfections = True
-                if dir3["pathSuffix"] == "fse":
-                    foundFSE = True
+# Create the base directory
+hdfsconn.make_dir("/input", permission=777)
 
-if foundInfections and foundFSE:
-    print("Starting separate Import Thread")
-    # Init the import thread once
-    import_thread = HDFSImportJob(hdfsconn, quandl_companies, fse_file_path, startdate, infection_import_url, infection_file_path, producer)
-    print("Import thread initialized. Main thread is going to sleep")
-    while True:
-        #Sleep and let the thread do the work
-        time.sleep(60)
+print("Starting separate Import Thread")
+# Init the import thread once
+import_thread = HDFSImportJob(hdfsconn, quandl_companies, fse_file_path, startdate, infection_import_url, infection_file_path, producer)
+print("Import thread initialized. Main thread is going to sleep")
+while True:
+    #Sleep and let the thread do the work
+    time.sleep(60)
