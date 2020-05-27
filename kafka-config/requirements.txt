@@ -1,2 +1,3 @@
 pywebhdfs
 mysql-connector
+kubernetes

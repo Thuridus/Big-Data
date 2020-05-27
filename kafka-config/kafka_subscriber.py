@@ -2,38 +2,50 @@
 from kafka import KafkaConsumer
 from sqlalchemy import create_engine
 import pywebhdfs.webhdfs
+import requests
 import mysql.connector
 import pandas
 import threading
 import time
 import csv
+import yaml
+import numpy
 from io import StringIO
+from kubernetes import client, config, watch
+from kubernetes.client.rest import ApiException
 
 class SparkDriverJob:
-    def __init__(self, kafka_producer, hdfs_connection, db_host, db_port, db_user, db_pw, db_name):
+    def __init__(self, hdfs_connection, db_host, db_port, db_user, db_pw, db_name):
         self.ExecutionActive = False
-        self.kafkaproducer = kafka_producer
         self.hdfsconnection = hdfs_connection
         self.dbhost = db_host
         self.dbport = db_port
         self.dbuser = db_user
         self.dbpw = db_pw
         self.dbname = db_name
-        thread = threading.Thread(target=self.run, args=())
-        thread.daemon = True                            # Daemonize thread
-        thread.start()   
         
-    def run(self):
-        #self.StartSparkExecution()
-        #self.ExportResultToDB()
-        #self.ValidateExport()
+    def ClearEnv(self):
+        self.hdfsconnection.delete_file_dir("/app", recursive=True)
+        self.hdfsconnection.delete_file_dir("/config", recursive=True)
+        self.hdfsconnection.delete_file_dir("/result", recursive=True)
 
-        for msg in self.kafkaproducer:
-            print("Message Received: ", msg)
-            message = str(msg.value.decode())
-            if message == 'new_data_available':
-                print("Received import notification from import pod. Starting Spark execution.")
-                #self.StartSparkExecution()   
+    def InitEnv(self):
+        # Create the app folder on hdfs and store file to it
+        driverurl = 'https://raw.githubusercontent.com/Thuridus/Big-Data/develop/pyspark-app/pyspark_driver.py'
+        drivercontent = requests.get(driverurl).content
+        self.hdfsconnection.make_dir("/app", permission=777)
+        self.hdfsconnection.create_file("/app/pyspark_driver.py", drivercontent)
+        # Create the config folder on hdfs and store file to it
+        deploymenturl = 'https://raw.githubusercontent.com/Thuridus/Big-Data/develop/pyspark-app/python_deployment.yml'
+        deploymentcontent = requests.get(deploymenturl).content
+        self.hdfsconnection.make_dir("/config", permission=777)
+        self.hdfsconnection.create_file("config/python_deployment.yml", deploymentcontent)
+        # Create the result directory
+        self.hdfsconnection.make_dir("/result/corona", permission=777)
+        self.hdfsconnection.make_dir("/result/dax", permission=777)
+        
+    def RunOnce(self):
+        self.StartSparkExecution()
 
     # Is called whenever a spark execution has to be started
     def StartSparkExecution(self):
@@ -43,19 +55,92 @@ class SparkDriverJob:
             print("Spark is still running")
             return
         # execute spark submit
+        yamlfile = self.hdfsconnection.read_file("/config/python_deployment.yml").decode()
+        yamlobj = yaml.load(yamlfile)
+        group = str(yamlobj["apiVersion"]).split('/')[0]
+        version = str(yamlobj["apiVersion"]).split('/')[1]
+
+        config.load_kube_config()
+        configuration = client.Configuration()
+        k8sapi = client.CustomObjectsApi(client.ApiClient(configuration))
+        v1 = client.CoreV1Api(client.ApiClient(configuration))
+        try:
+            # delete latest output files by recreating output directory
+            self.hdfsconnection.delete_file_dir("/result", recursive=True)
+            self.hdfsconnection.make_dir("/result/corona", permission=777)
+            self.hdfsconnection.make_dir("/result/dax", permission=777)
+
+            # ensure that resource is deleted
+            k8sapi.delete_namespaced_custom_object(group=group, version=version,plural="sparkapplications", name="python-spark", namespace="default", body=client.V1DeleteOptions())
+        except ApiException as exception:
+            print(exception)
+
+
+        driverSuccessfull = False
+        driverrunning = True
+        try:
+            k8sapi.create_namespaced_custom_object(group=group, version=version, namespace="default", plural="sparkapplications", body=yamlobj)
+            print("Driver pod created")
+
+            while driverrunning:
+                ret = v1.list_pod_for_all_namespaces(watch=False)
+                for i in ret.items:
+                    if i.metadata.name == "python-spark-driver":
+                        if i.status.container_statuses[0].state.terminated == None:
+                            driverrunning = True
+                        else:
+                            print("Driver pod is terminated. Status: " + str(i.status.container_statuses[0].state.terminated))
+                            if i.status.container_statuses[0].state.terminated.exit_code == 0:
+                                driverSuccessfull = True
+                            driverrunning = False
+
+                        break
+                if driverrunning:
+                    time.sleep(1)
+
+            #Delete driver        
+            k8sapi.delete_namespaced_custom_object(group=group, version=version,plural="sparkapplications", name="python-spark", namespace="default", body=client.V1DeleteOptions())
+        except ApiException as exception:
+            print(exception)
         
-        print("Spark execution finished")
+        if driverSuccessfull:
+            self.ExportResultToDB()
         self.ExecutionActive = False
 
     def ExportResultToDB(self):
+        # clear db before inserting new data
+        dbconn = mysql.connector.connect(host=self.dbhost, port=self.dbport, user=self.dbuser, password=self.dbpw, database=self.dbname, auth_plugin='mysql_native_password')
+        dbcursor = dbconn.cursor()
+        dbcursor.execute('DELETE FROM infects')
+        dbcursor.execute('DELETE FROM dax')
+        dbcursor.close()
+        dbconn.close()
+
         #read results from hdfs into datafram
-        covidcsv = self.hdfsconnection.read_file("/tmp/results/corona.csv").decode()
-        dataframecovid = pandas.read_csv(StringIO(covidcsv), index_col='date', keep_default_na=False)
+        coronafilename = ''
+        coronadirstat = self.hdfsconnection.list_dir("/result/corona/")['FileStatuses']['FileStatus']
+        for dirstat in coronadirstat:
+            if dirstat['pathSuffix'] is not '_SUCCESS':
+                coronafilename = dirstat['pathSuffix']
         
-        daxcsv = self.hdfsconnection.read_file("/tmp/results/dax.csv").decode()
+        daxfilename = ''
+        daxdirstat = self.hdfsconnection.list_dir("/result/dax/")['FileStatuses']['FileStatus']
+        for dirstat in daxdirstat:
+            if dirstat['pathSuffix'] is not '_SUCCESS':
+                daxfilename = dirstat['pathSuffix']
+
+        covidcsv = self.hdfsconnection.read_file("/result/corona/" + coronafilename).decode()
+        dataframecovid = pandas.read_csv(StringIO(covidcsv), index_col='date', keep_default_na=False)
+        for column in dataframecovid.columns:
+            dataframecovid[column] = dataframecovid[column].replace('', numpy.nan, regex=True)
+            dataframecovid[column] = dataframecovid[column].fillna(0)
+            print(dataframecovid[column])
+
+        daxcsv = self.hdfsconnection.read_file("/result/dax/" + daxfilename).decode()
         dataframedax = pandas.read_csv(StringIO(daxcsv), index_col='Date')
         dataframedax = dataframedax.rename(columns={"Date" : "date", "open_sum" : "open", "close_sum" : "close", "abs_diff": "diff"})
         dataframedax.index.names = ["date"]
+        
 
 
         dbengine =  create_engine('mysql+pymysql://{user}:{pw}@{host}:{port}/{db}'.format(user=self.dbuser, pw=self.dbpw, db=self.dbname, port=self.dbport, host=self.dbhost))
@@ -66,55 +151,26 @@ class SparkDriverJob:
     def ValidateExport(self):
         dbtest = mysql.connector.connect(host=self.dbhost, port=self.dbport, user=self.dbuser, password=self.dbpw, database=self.dbname, auth_plugin='mysql_native_password')
         cursor = dbtest.cursor()
-        cursor.execute("SELECT * FROM infects")
-        for val in cursor:
-            print(val)
-        cursor.close()
-        cursor = dbtest.cursor()
-        cursor.execute('SELECT * FROM dax')
-        for val in cursor:
-            print(val)
-        cursor.close()
-        dbtest.close()
+        with open('/root/Desktop/github_repo/kafka-config/testout.txt', 'w') as fileop:
+            cursor.execute("SELECT * FROM infects")
+            for val in cursor:
+                print(val, file=fileop)
+            cursor.close()
+            cursor = dbtest.cursor()
+            cursor.execute('SELECT * FROM dax')
+            for val in cursor:
+                print(val)
+            cursor.close()
+            dbtest.close()
 
 
 
 
 # Connect to HDFS to gather result data
 #hdfsweburl = "http://" + str(socket.gethostbyname("knox-apache-knox-helm-svc")) + ":8080"
-hdfsweburl = "http://10.0.2.15:31583"
+hdfsweburl = "http://10.0.2.15:30283"
 hdfsconn = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{hdfsweburl}/webhdfs/v1/",
                                          request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
-
-# Debug preparation code
-#hdfsconn.make_dir("/tmp/results")
-#dataframecovid = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/corona/part-00000-c5db4887-e907-453b-b95e-753eb8d81c40-c000.csv", index_col='date', keep_default_na=False, encoding='utf-8')
-#print(dataframecovid)
-#csvdata = dataframecovid.to_csv(sep=",",index=True, line_terminator='\n', encoding='utf-8')
-#hdfsconn.delete_file_dir("/tmp/results/corona.csv")
-#hdfsconn.create_file("/tmp/results/corona.csv", csvdata, permission=777)
-
-#hdfsconn.delete_file_dir("/tmp/results/dax.csv")
-#dataframedax = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/dax/part-00000-1a7de9b8-84a2-4682-8950-483587a10c67-c000.csv", index_col='Date', keep_default_na=False, encoding='utf-8')
-#hdfsconn.create_file("/tmp/results/dax.csv", dataframedax.to_csv(sep=",", index=True, line_terminator="\n"), permission=777)
-
-with open('/root/Desktop/github_repo/pyspark-app/pyspark_driver.py', 'r') as file:
-    hdfsconn.make_dir("/app")
-    filecontent = file.read()
-    hdfsconn.delete_file_dir("/app/pyspark_driver.py")
-    hdfsconn.create_file("/app/pyspark_driver.py", filecontent, permission=777)
-
-
-# Clear DB
-#dbtest = mysql.connector.connect(host='10.0.2.15', port='30813', user='root', password='mysecretpw', database='mysqldb', auth_plugin='mysql_native_password')
-#dbcursor = dbtest.cursor()
-#dbcursor.execute('DELETE FROM infects')
-#dbcursor.execute('DELETE FROM dax')
-#dbcursor.close()
-#dbtest.close()
-
-
-
 
 # The bootstrap server to connect to
 bootstrap = 'my-cluster-kafka-bootstrap:9092'
@@ -122,26 +178,21 @@ bootstrap = 'my-cluster-kafka-bootstrap:9092'
 # Create a comsumer instance
 print('Starting KafkaConsumer')
 #consumer = KafkaConsumer('spark_notification', bootstrap_servers='my-cluster-kafka-bootstrap:9092')
-consumer = KafkaConsumer('spark_notification', bootstrap_servers='10.0.2.15:31952')
+#consumer = KafkaConsumer('spark_notification', bootstrap_servers='10.0.2.15:32598')
+consumer = "TEST"
 
 
+driverjob = SparkDriverJob(hdfsconn, '10.0.2.15', 31097, 'root', 'mysecretpw', 'mysqldb')
+driverjob.ClearEnv()
+driverjob.InitEnv()
+# First time we start
+print("start spark execution on fist start")
+driverjob.RunOnce()
 
-
-driverjob = SparkDriverJob(consumer, hdfsconn, '10.0.2.15', 30813, 'root', 'mysecretpw', 'mysqldb')
-
-
-# Create Dataframe from results on HDFS
-#dataframecovid = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/corona/part-00000-c5db4887-e907-453b-b95e-753eb8d81c40-c000.csv", index_col='date')
-#dataframedax = pandas.read_csv("/root/Desktop/github_repo/pyspark-app/result/dax/part-00000-1a7de9b8-84a2-4682-8950-483587a10c67-c000.csv", index_col='Date')
-#dataframedax = dataframedax.rename(columns={"Date" : "date", "open_sum" : "open", "close_sum" : "close", "abs_diff": "diff"})
-#dataframedax.index.names = ["date"]
-
-
-#dbengine =  create_engine('mysql+pymysql://{user}:{pw}@10.0.2.15:30813/{db}'.format(user='root', pw='mysecretpw', db='mysqldb'))
-#with dbengine.connect() as dbconnection:
-#    result = dataframecovid.to_sql('infects', dbconnection, if_exists='append')
-#    re6sult = dataframedax.to_sql('dax', dbconnection, if_exists='append')
-
-
-
-
+#for msg in consumer:
+#    print("Message Received: ", msg)
+#    message = str(msg.value.decode())
+#    if message == 'new_data_available':
+#        print("Received import notification from import pod. Starting Spark execution.")
+#        driverjob.RunOnce()
+#        print("Driver Job finished. New Data in available in DB")
