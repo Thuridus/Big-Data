@@ -276,13 +276,7 @@ Select * from infects;
 exit
 ```
 
-### Test Interface
-
-Navigate to my-database and run *.yml-files
-```
-kubectl apply -f my-mysql-deployment.yml
-kubectl apply -f my-memcache-deployment.yml
-```
+### Start User-Interface
 
 Check if service is running on minikube
 ```
@@ -290,12 +284,16 @@ minikube dashboard
 ```
 
 Navigate to /app/
+```
+cd ../app/
+```
+
 Build Interface-Dockerfile and run interface-deployment
 ```
 docker build -t interface .
 ```
 
-Run Docker-Image
+Run interface-Deployment
 ```
-docker run -p 8080:8080 interface
+kubectl apply -f interface-deployment.yml
 ```

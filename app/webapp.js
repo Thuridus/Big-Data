@@ -6,6 +6,10 @@ const app = addAsync(express());
 const mysqlx = require('@mysql/xdevapi');
 const MemcachePlus = require('memcache-plus');
 const router = express.Router();
+const colors = require('colors');
+
+// Months
+const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
 
 //Connect to the memcached instances
 let memcached = null
@@ -17,7 +21,7 @@ const dbConfig = {
 	password: 'mysecretpw',
 	host: 'my-app-mysql-service',
 	port: 33060,
-	schema: 'sportsdb'
+	schema: 'mysqldb'
 };
 
 // Oberfläche einbinden
@@ -26,30 +30,22 @@ router.get('/', function(req,res){
 });
 app.use(express.static(__dirname));
 app.use('/', router);
-
-console.log("Dirname: " + __dirname);
+app.use(express.json());
 
 var server = app.listen(8080, function () {
 	var host = server.address().address
 	var port = server.address().port
-	console.log('Express app listening at http://%s:%s', host, port)
+	console.log('- Express app listening at http://%s:%s', host, port)
 });
 
-/*
-console.log("Start lookup");
-dns.lookup('google.com', {all: true}, function(err, addresses){
-	if(err) console.log(err);
-	console.log('addresses: %j', addresses);
-});
-*/
 // Aktualisieren der Memcached-Instancen (alle 5 sec)
-async function getMemcachedServersFromDns() {	
+async function getMemcachedServersFromDns() {
 	let queryResult = await dns.lookup('my-memcached-service', { all: true });
 	let servers = queryResult.map(el => el.address + ":11211")
 
 	//Only create a new object if the server list has changed
 	if (memcachedServers.sort().toString() !== servers.sort().toString()) {
-		console.log("Updated memcached server list to ", servers)
+		console.log("- Updated memcached server list to ", servers)
 		memcachedServers = servers
 		//Disconnect an existing client
 		if (memcached)
@@ -59,74 +55,93 @@ async function getMemcachedServersFromDns() {
 }
 
 //Initially try to connect to the memcached servers, then each 5s update the list
-//getMemcachedServersFromDns()
-//setInterval(() => getMemcachedServersFromDns(), 5000)
+getMemcachedServersFromDns()
+setInterval(() => getMemcachedServersFromDns(), 5000)
 
 //Get data from cache if a cache exists yet
 async function getFromCache(key) {
+	if(key.length > 250){
+		console.log(`- Key: ${key} to long for a search in Memcache`);
+		return null;
+	}
 	if (!memcached) {
-		console.log(`No memcached instance available, memcachedServers = ${memcachedServers}`)
+		console.log(`- No memcached instance available, memcachedServers: ${memcachedServers}`)
 		return null;
 	}
 	return await memcached.get(key);
 }
 
 //Get data from database
-async function getFromDatabase(query) {
+async function getFromDatabase(query, grouptyp) {
 	let session = await mysqlx.getSession(dbConfig);
-	console.log("Executing query " + query);
+	console.log("- Executing query " + query);
 
 	let res = await session.sql(query).execute();
-
-	// TODO Hier wird das JSON erstellt
-	let row = res.fetchOne();
-	if (row) {
-		console.log("Query result = ", row);
-		return row[0];
-	} else {
-		return null;
+	
+	// Ergebnis verarbeiten
+	var resultJSON = [], row;
+	while (row = res.fetchOne()) {
+		var element = {};
+		if(grouptyp == "MONTH"){
+			element.fieldname = months[row[1]] + " " + row[0];
+		}else if(grouptyp == "WEEK"){
+			element.fieldname = "KW " + row[1] + " " + row[0];
+		}else{
+			element.fieldname = row[1];
+		}
+        element.corona = row[2];
+		element.dax = row[3];
+		resultJSON.push(element);
 	}
+	console.log(resultJSON);
+	return JSON.stringify(resultJSON);
+}
+// get countrys from DB
+async function getCountrysFromDatabase(res) {
+	let session = await mysqlx.getSession(dbConfig);
+	let result = await session.sql("SELECT DISTINCT country FROM `infects` ORDER BY country;").execute();
+	var resultJSON = [], row;
+	while (row = result.fetchOne()) {
+		resultJSON.push(row[0]);
+	}
+	res.send(resultJSON);
 }
 
 function send_response(response, data) {
-	
+	response.send(data);
 }
 
 app.post('/serverAbfrageStarten/', function (req, res) {
-    if (req.method == 'POST') {
-        var body = '';
-        req.on('data', function (data) {
-            body += data;
-        });
-        req.on('end', function () {
-            runRequest(JSON.parse(body), res);
-        });
-    }
+	console.log(`- Start DB Abfrage für ${req.body.sql}`.blue);
+	console.log(`- Key der Abfrage ${req.body.key} (${req.body.key.length})`.blue);
+	runRequest(req.body, res);
 });
 
 app.get('/getCountrys/', function (req, res){
-    var country = ['Germany', 'Croatia', 'Austria', 'Italy', 'Switzerland'];
-    res.send(country);
+	console.log("- Run country Query")
+	getCountrysFromDatabase(res);
 });
 
 
 async function runRequest(json, response) {
-	let sql = json.sql;
-	let cachedata = await getFromCache(sql);
+	var sql = json.sql;
+	var key = json.key;
+	let cachedata = await getFromCache(key);
 
 	if (cachedata) {
-		console.log(`Cache hit for key=${key}, cachedata = ${cachedata}`);
+		console.log(`- Cache hit for key="${key}", cachedata = ${cachedata}`.green);
 		response.send(cachedata);
 	} else {
-		console.log(`Cache miss for key=${key}, querying database`);
-		let data = await getFromDatabase(sql);
+		console.log(`- Cache miss for key="${key}", querying database`.red);
+		let data = await getFromDatabase(sql, json.grouptyp);
 		if (data) {
-			console.log(`Got data=${data}, storing in cache`);
-			if (memcached)
-				await memcached.set(sql, data, 30 /* seconds */);
+			if(key.length <= 250){
+				console.log(`- Storing data in cache`.green);
+				if (memcached) await memcached.set(key, data, 300 /* seconds */);
+			}
 			send_response(response, data);
 		} else {
-			console.log(`No data found!`);
+			console.log(`- No data found!`.red);
 			send_response(response, "No data found");
 		}
 	}
