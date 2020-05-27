@@ -138,6 +138,8 @@ minikube
 helm
 python3 spark pyspark 
 ```
+
+
 ## Starting minikube <a name="minikube"></a>
 
 Start minicube with Hyper V driver (make sure Hyper V is enabled)
@@ -165,6 +167,7 @@ Enable Load Balancer (Ingress)
 minikube addons enable ingress
 ```
 
+
 ## Deploy HDFS on K8S: <a name="k8s"></a>
 ### Deploying HDFS <a name="hdfs"></a>
 
@@ -189,6 +192,7 @@ helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
 helm install --set "knox.hadoop.nameNodeUrl=hdfs://hadoop-hadoop-hdfs-nn:9000/" --set "knox.hadoop.resourceManagerUrl=http://hadoop-hadoop-yarn-rm:8088/ws" --set "knox.hadoop.webHdfsUrl=http://hadoop-hadoop-hdfs-nn:50070/webhdfs/" --set "knox.hadoop.hdfsUIUrl=http://hadoop-hadoop-hdfs-nn:50070" --set "knox.hadoop.yarnUIUrl=http://hadoop-hadoop-yarn-ui:8088" --set "knox.servicetype=LoadBalancer" knox pfisterer-knox/apache-knox-helm
 ```
 
+
 ## Deploy the periodic import pod on K8S:<a name="deplox"></a>
 ### Create necessary docker image for Data import POD <a name="docker"></a>
 ```
@@ -208,6 +212,7 @@ To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
 minikube service knox-apache-knox-helm-svc --url
 ```
 
+
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
 ### Install Strimzi operator <a name="strimzi"></a>
 Install strimzi operator via Helm
@@ -220,6 +225,7 @@ Navigate shell into 'kafka-config' folder
 ```
 kubectl apply -f kafka-cluster-def.yaml
 ```
+
 
 ## Deploy Spark on K8S <a name="sparkk8s"></a>
 
@@ -242,6 +248,7 @@ helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubato
 
 helm install spark incubator/sparkoperator --namespace spark-operator --set sparkJobNamespace=default
 ```
+
 
 ## Deploy the database <a name="deploydb"></a>
 ### Create necessary DB-Pod
@@ -273,6 +280,7 @@ Create a POD and deploy it to minikube
 ```
 kubectl apply -f my-memcache-deployment.yml
 ```
+
 
 ## Start User-Interface <a name="deployinterface"></a>
 
