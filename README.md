@@ -41,7 +41,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 
 ## Big Data Architecture :house:<a name="architecture"></a>
 
-### Overview Architektur:<a name="overview"></a>
+### Overview Architektur:
 * HDFS speichert Daten zur Börse (Frankfurt Stock Exchange) und Covid-19 (Ansteckungen und Verstorbene pro Tag)
 * Die Daten werden durch einen Standalone Python-Import-Pod zyklisch aktualisiert
 * Über das Kafka Cluster wird vom Python-Import-Pod eine Benachrichtigung an Apache Spark über neue Daten gesendet
@@ -56,7 +56,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 
 ![](images/architecture.png)
 
-### Python-Import-Pod: <a name="python-import-pod"></a>
+### Python-Import-Pod:
 * Importiert stündlich die neuesten Daten aus folgenden Quellen:
   * Frankfurt Stock Exchange: https://www.quandl.com/data/FSE-Frankfurt-Stock-Exchange
   * Infektionsdaten COVID-19: https://opendata.ecdc.europa.eu/covid19/casedistribution/json/
@@ -64,13 +64,13 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 * Nach Import wird über Kafka eine Benachrichtigung an den Spark Driver Pod gesendet. *(Anmerkung: Integration von Apache Hadoop als Kafka Producer zu aufwendig)*
 * PyWebHDFS wird zur Interaktion mit dem HDFS verwendet
 
-### Data Lake (HDFS): <a name="data lake"></a>
+### Data Lake (HDFS):
 * Daten aus Börse (link siehe Python-Import-Pod) und Daten aus Covid (link siehe Python-Import-Pod) werden als CSV gespeichert
 * Daten Covid werden alle 1h aktualisiert. *(Anmerkung: Datenquelle aktualisiert sich jedoch nur täglich)*
 * Daten Börse werden alle 1h aktualisiert.
 * Apache Knox wird zur Interaktion mit HDFS verwendet.
 
-### Big Data Messaging (Kafka Cluster): <a name="kafka"></a>
+### Big Data Messaging (Kafka Cluster):
 * Messaging System zwischen Apache Spark und HDFS
 * Kafka Cluster wird über Helm hochgefahren (siehe: https://strimzi.io/charts/index.yaml)
 * Kafka Producer: Python-Import-Pod
@@ -79,7 +79,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 * Replikation: 1 *(Anmerkung: Es werden grds. 3 bis 5 broker in einem Kafka Cluster für eine hohe Verfügbarkeit und einen schnellen Durchlauf empfohlen)*
 * Mögliche Erweiterung: Web Servcer Producer Nutzungsdaten sendet Nutzungsdaten der Weboberfläche an Data Lake Consumer.
 
-### Big Data&Science Processing (Apache Spark): <a name="spark"></a>
+### Big Data&Science Processing (Apache Spark):
 * Dient dem Data Processing der Daten aus HDFS
 * Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann greift Apache Spark auf die Daten in HDFS zu
 * Apache Spark verarbeitet die Daten und sendet an die Datenbank
@@ -88,47 +88,48 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
   * Aktienkurse werden zu DAX aufsummiert
   * Absolute und relative Veränderungen zwischen den Tagen werden kalkuliert
 
-### Datenbank (MySQL-Datenbank): <a name="db"></a>
+### Datenbank (MySQL-Datenbank): 
 * Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
 * Tabelle sieht so aus: ....
 
-### Web Server (Node.js): <a name="webserver"></a>
+### Web Server (Node.js):
 * Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
 * Nutzer können Parameter einstellen, die zu einer SQL-Abfrage bei der MySQL-Datenbank führen
 * In Memcached werden die bisherigen SQL-Abfragen gespeichert (siehe dazu Memcached)
 * Web Server prüft die Verfügbarkeit im Cache bevor er eine SQL-Abfrage bei der MySQL-Dantenbank durchführt (siehe dazu Memcached)
 
-### Cache-Server (Memcached): <a name="cacheserver"></a>
+### Cache-Server (Memcached):
 * Aus den SQL-Abfragen des Web Servers an den MySQL-Server wird ein Key erstellt und in Memchached abgelegt
 * Wenn ein Key nicht vorhanden ist wird die SQL-Abfrage an den MySQL-Server gesendet und in Memcached als Key abgelegt
 * In Memcached wird neben dem Key das jeweilige Ergebnis der Abfrage gespeichert
 * In Memcached werden Daten maximal X Minuten gespeichert
 
-### Load Balancer (Ingress): <a name="loadbalancer"></a>
+### Load Balancer (Ingress):
 * Ingress => ML ergänzt
 
 ## Funktionsweise der Benutzeroberfläche <a name="oberfläche"></a>
 Die Benutzeroberfläche entspricht dem Endpunkt der Architektur, über welchen der Enduser in der Regel Daten der Anwendung abfragt. Hierzu kann nach dem Start der unterschiedlichen Architekturkomponenten (min. nach dem Start des Webservers (webapp.js)) die Adresse localhost:8080 über einen beliebigen Internetbrowser aufgerufen werden.
 
-### Anwendungslogik der Oberfläche <a name="logik"></a>
+### Anwendungslogik der Oberfläche 
 Die Anwendungslogik validiert und Verarbeitet die jeweiligen Nutzeranfragen und aktualisert die auf der Oberfläche angezeigten Grafen. Bei den Parametern der Nutzeranfrage werden folgende unterschieden:
 
-#### Auswahl eines Datumbereichs <a name="datum"></a>
+#### Auswahl eines Datumbereichs
 Es muss in jedem Fall ein Datumsbereich ausgwählt werden. Je nach größe des Bereichs wird der Graf auf Monate, Kalenderwochen oder Tage skaliert.
 * Monate: Datumsrange größer 4 Monate
 * Wochen: Datumsrange zwischen 4 Wochen und 4 Monaten
 * Tage: Datumsrange kleiner 28 Tage (4 Wochen) 
 
-#### Auswahl der Betrachtungsländer <a name="länder"></a>
+#### Auswahl der Betrachtungsländer 
 Unter Verwendung einer Checkbox-Liste können die Länder ausgewählt werden, deren Coronadaten für den Vergleich herangezogen werden sollen. Das Land "Deutschland" ist standardmäßig ausgewählt
-#### Relative Veränderung zum Vortag <a name="relative"></a>
+
+#### Relative Veränderung zum Vortag
 Bei den Coronadaten können wahlweise entweder die tatsächliche Tagesveränderung (Neuerkrankungen bzw. Todesfälle) oder die relative Veränderung zum Vortag angezeigt werden.
 
-#### Art der Coronadaten <a name="coronadaten"></a>
+#### Art der Coronadaten
 Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
 
 
-### Prerequisites <a name="prerequisits"></a>
+### Prerequisites 
 
 TODO: What things you need to install the software and how to install them
 
@@ -169,7 +170,7 @@ minikube addons enable ingress
 
 
 ## Deploy HDFS on K8S: <a name="k8s"></a>
-### Deploying HDFS <a name="hdfs"></a>
+### Deploying HDFS 
 
 Add helm stable repo and install chart for stable hadoop cluster
 ```
@@ -185,7 +186,8 @@ hdfs dfs -chmod  777 /
 exit
 ```
 
-### Install Apache Knox - REST API and Application Gateway <a name="apache"></a>
+### Install Apache Knox - REST API and Application Gateway
+
 using helm chart pfisterer/apache-knox-helm
 ```
 helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
@@ -194,7 +196,7 @@ helm install --set "knox.hadoop.nameNodeUrl=hdfs://hadoop-hadoop-hdfs-nn:9000/" 
 
 
 ## Deploy the periodic import pod on K8S:<a name="deplox"></a>
-### Create necessary docker image for Data import POD <a name="docker"></a>
+### Create necessary docker image for Data import POD
 ```
 # After running the docker-env command, navigate to the python_hdfs directory (it contains one dockerfile)
 # the created image will connect to the knox-apache-knox-helm-svc via DNS Lookup within the K8S cluster
@@ -214,13 +216,13 @@ minikube service knox-apache-knox-helm-svc --url
 
 
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
-### Install Strimzi operator <a name="strimzi"></a>
+### Install Strimzi operator
 Install strimzi operator via Helm
 ```
 helm repo add strimzi http://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
 ```
-### Apply Kafka Cluster Deployment <a name="kafka deploy"></a>
+### Apply Kafka Cluster Deployment
 Navigate shell into 'kafka-config' folder
 ```
 kubectl apply -f kafka-cluster-def.yaml
@@ -231,7 +233,7 @@ kubectl apply -f kafka-cluster-def.yaml
 
 The pyspark app is put into hdfs /app/ 
 
-### Spark Operator in separate workspace <a name="sparkoperator"></a>
+### Spark Operator in separate workspace
 Create a namespace with the name ‘spark-operator’
 ```
 #navigate to the folder "pyspark-app"
