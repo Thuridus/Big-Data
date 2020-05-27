@@ -1,2 +1,0 @@
-pywebhdfs
-mysql-connector

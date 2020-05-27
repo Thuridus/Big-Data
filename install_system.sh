@@ -15,5 +15,11 @@ echo 'Installing HDFS Component'
 cd ./python_hdfs
 sh ./install_hdfs.sh
 cd ..
-kubectl get all
+# Install the Spark component
+echo 'Installing Spark component'
+cd ./pyspark_app
+sh ./install_pyspark.sh
+cd ..
 echo 'System install finished'
+# See it all rising
+watch kubectl get all

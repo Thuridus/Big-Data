@@ -1,5 +1,10 @@
 #!/bin/bash
 # This scipt uninstalls previously installed components of the BIG-Data environment
+# Uninstall the Spark component
+echo 'Installing Spark component'
+cd ./pyspark_app
+sh ./install_pyspark.sh
+cd ..
 # Uninstall the Hadoop Filesystem components
 echo 'Uninstalling HDFS Component'
 cd ./python_hdfs
