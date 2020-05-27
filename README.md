@@ -114,18 +114,8 @@ Unter Verwendung einer Checkbox-Liste können die Länder ausgewählt werden, de
 Bei den Coronadaten können wahlweise entweder die tatsächliche Tagesveränderung (Neuerkrankungen bzw. Todesfälle) oder die relative Veränderung zum Vortag angezeigt werden.
 
 #### Art der Coronadaten
-Bei der Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
+Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
 
-
-
-
-
- 
-
-## TODO
-Description of idea, architecture, design and screenshots of demo  
-Licence for documentation (Creative Commons)
-....
 
 ### Prerequisites
 
@@ -135,7 +125,7 @@ TODO: What things you need to install the software and how to install them
 Docker
 minikube
 helm
-? python3 spark pyspark 
+python3 spark pyspark 
 ```
 ## Starting minikube
 
@@ -159,15 +149,18 @@ minikube -p minikube docker-env | Invoke-Expression
 #on Mac
 eval $(minikube docker-env)
 ```
+Enable Load Balancer (Ingress)
+```
+minikube addons enable ingress
+```
 
 ## Deploy HDFS on K8S:
 ### Deploying HDFS
 
-Add helm stable repo and 
-install chart for stable hadoop cluster
+Add helm stable repo and install chart for stable hadoop cluster
 ```
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
-# if unsing helm for the first time run "helm init"
+# if using helm for the first time run "helm init"
 helm install --namespace=default --set hdfs.dataNode.replicas=2 --set yarn.nodeManager.replicas=1 --set hdfs.webhdfs.enabled=true hadoop stable/hadoop
 ```
 
@@ -178,7 +171,7 @@ hdfs dfs -chmod  777 /
 exit
 ```
 
-Install Apache Knox - REST API and Application Gateway
+### Install Apache Knox - REST API and Application Gateway
 using helm chart pfisterer/apache-knox-helm
 ```
 helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
@@ -239,29 +232,8 @@ helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubato
 helm install spark incubator/sparkoperator --namespace spark-operator --set sparkJobNamespace=default
 ```
 
-### Run pyspark_driver.py with spark-submit using csturm/spark-py image
-
-### 2 Oprions - both not working :D
-Option 1:
-```
-#navigate to the folder "pyspark-app"
-kubectl apply -f pyspark.yml
-kubectl apply -f spark-schedule.yml
-```
-
-Option 2:
-Get IP of kubernetes master 
-```
-kubectl cluster-info
-```
-Start Spark using IP of kubernetes master 
-```
-spark-submit --master k8s://https://{Kubernetes-master-IP:Port} --deploy-mode cluster --name pyspark_driver --conf spark.executor.instances=2 --conf spark.kubernetes.container.image=csturm/spark-py:v2.4.4  {path to the file}/pyspark_driver.py
-```
-
 ## Deploy the database
-
-### Create necessary POD
+### Create necessary DB-POD
 
 Build a connection to the "my-database" folder
 ```
@@ -271,6 +243,7 @@ cd my-database
 
 Create a POD and deploy it to minikube
 ```
+kubectl apply -f config-app.yml
 kubectl apply -f my-mysql-deployment.yml
 ```
 ```
@@ -283,45 +256,11 @@ kubectl get pods -o wide
 #Enter the pod to check if its working
 kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
 ```
+### Create necessary Memcached-Pod
 
-### Test connection to database
-
-Build a connection to the database "my-database.sql" and get the entries
+Create a POD and deploy it to minikube
 ```
-#kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
-USE mysqldb
-```
-
-```
-#Get all entries from database (e.x from the table infects) with a sql-statement
-Select * from infects;
-```
-
-```
-#Leave the database
-exit
-```
-
-### Test Interface
-
-Navigate to my-database and run *.yml-files
-```
-kubectl apply -f my-mysql-deployment.yml
 kubectl apply -f my-memcache-deployment.yml
 ```
 
-Check if service is running on minikube
-```
-minikube dashboard
-```
 
-Navigate to /app/
-Build Interface-Dockerfile and run interface-deployment
-```
-docker build -t interface .
-```
-
-Run Docker-Image
-```
-docker run -p 8080:8080 interface
-```
