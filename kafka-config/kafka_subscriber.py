@@ -1,7 +1,11 @@
 # Install: pip3 install kafka-python
 from kafka import KafkaConsumer
 from sqlalchemy import create_engine
+from io import StringIO
+from kubernetes import client, config, watch
+from kubernetes.client.rest import ApiException
 import pywebhdfs.webhdfs
+import socket
 import requests
 import mysql.connector
 import pandas
@@ -10,9 +14,7 @@ import time
 import csv
 import yaml
 import numpy
-from io import StringIO
-from kubernetes import client, config, watch
-from kubernetes.client.rest import ApiException
+
 
 class SparkDriverJob:
     def __init__(self, hdfs_connection, db_host, db_port, db_user, db_pw, db_name):
@@ -96,7 +98,7 @@ class SparkDriverJob:
 
                         break
                 if driverrunning:
-                    time.sleep(1)
+                    time.sleep(5)
 
             #Delete driver        
             k8sapi.delete_namespaced_custom_object(group=group, version=version,plural="sparkapplications", name="python-spark", namespace="default", body=client.V1DeleteOptions())
@@ -134,15 +136,12 @@ class SparkDriverJob:
         for column in dataframecovid.columns:
             dataframecovid[column] = dataframecovid[column].replace('', numpy.nan, regex=True)
             dataframecovid[column] = dataframecovid[column].fillna(0)
-            print(dataframecovid[column])
 
         daxcsv = self.hdfsconnection.read_file("/result/dax/" + daxfilename).decode()
         dataframedax = pandas.read_csv(StringIO(daxcsv), index_col='Date')
         dataframedax = dataframedax.rename(columns={"Date" : "date", "open_sum" : "open", "close_sum" : "close", "abs_diff": "diff"})
         dataframedax.index.names = ["date"]
         
-
-
         dbengine =  create_engine('mysql+pymysql://{user}:{pw}@{host}:{port}/{db}'.format(user=self.dbuser, pw=self.dbpw, db=self.dbname, port=self.dbport, host=self.dbhost))
         with dbengine.connect() as dbconnection:
             dataframecovid.to_sql('infects', dbconnection, if_exists='append')
@@ -167,8 +166,7 @@ class SparkDriverJob:
 
 
 # Connect to HDFS to gather result data
-#hdfsweburl = "http://" + str(socket.gethostbyname("knox-apache-knox-helm-svc")) + ":8080"
-hdfsweburl = "http://10.0.2.15:30283"
+hdfsweburl = "http://" + str(socket.gethostbyname("knox-apache-knox-helm-svc")) + ":8080"
 hdfsconn = pywebhdfs.webhdfs.PyWebHdfsClient(base_uri_pattern=f"{hdfsweburl}/webhdfs/v1/",
                                          request_extra_opts={'verify': False, 'auth': ('admin', 'admin-password')})
 
@@ -177,12 +175,11 @@ bootstrap = 'my-cluster-kafka-bootstrap:9092'
 
 # Create a comsumer instance
 print('Starting KafkaConsumer')
-#consumer = KafkaConsumer('spark_notification', bootstrap_servers='my-cluster-kafka-bootstrap:9092')
-#consumer = KafkaConsumer('spark_notification', bootstrap_servers='10.0.2.15:32598')
-consumer = "TEST"
+consumer = KafkaConsumer('spark_notification', bootstrap_servers='my-cluster-kafka-bootstrap:9092')
 
+mysqlhost = str(socket.gethostbyname("my-app-mysql-service"))
 
-driverjob = SparkDriverJob(hdfsconn, '10.0.2.15', 31097, 'root', 'mysecretpw', 'mysqldb')
+driverjob = SparkDriverJob(hdfsconn, mysqlhost, 3306, 'root', 'mysecretpw', 'mysqldb')
 driverjob.ClearEnv()
 driverjob.InitEnv()
 # First time we start

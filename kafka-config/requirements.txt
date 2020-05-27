@@ -1,3 +1,5 @@
 pywebhdfs
 mysql-connector
 kubernetes
+kafka-python
+sqlalchemy
