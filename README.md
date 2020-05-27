@@ -9,19 +9,18 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 
 - [X] Komponente: Data-Lake (HDFS)
 - [X] Komponente: Big Data Messaging (Kafka)
-- [ ] Komponente: Big Data Processing (Apache Spark)
+- [ ] Komponente: Big Data Processing (Apache Spark)=> Integration fehlt
 - [X] Komponente: DB Server (mysql)
-- [ ] Komponente: Load Balancer (Ingress)
-- [ ] Komponente: Web Server
-- [ ] Komponente: Cache Server
+- [X] Komponente: Load Balancer (Ingress)
+- [ ] Komponente: Web Server => Fehlerbehebung läuft
+- [ ] Komponente: Cache Server => Fehlerbehebung läuft
 - [X] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
 - [ ] Das Ergebnis der Berechnungen im Big Data-System werden in der Datenbank gespeichert
-- [ ] Der Web Server liefert diese Ergebnisse aus
-- [ ] Optional: Daten aus der Webanwendung können in die Berechnung einfließen => MAchen wir nicht
+- [X] Der Web Server liefert diese Ergebnisse aus
 - [X] Lizenz Quellcode (Apache)
 - [X] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
 - [ ] Dokumentation der Anwendung
-- [ ] Screencast
+- [ ] Screencast => Erstellt FG
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
 - [X] Grundsätzliche Idee der Anwendung erklären
