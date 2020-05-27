@@ -5,7 +5,15 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
 ## Inhaltsverzeichnis
-1. [Architecture](#architecture)
+1. [Big Data Architecture](#architecture)
+2. [Funktionsweise der Benutzeroberfläche](#oberfläche)
+3. [Starting minikube](#minikube)
+4. [Deploy HDFS on K8S](#k8s)
+5. [Deploy the periodic import pod on K8S](#deplox)
+6. [Deploy Kafka cluster on K8S](#kafkacluser)
+7. [Deploy Spark on K8S](#sparkk8s)
+8. [Deploy the database](#deploydb)
+9. [Start User-Interface](#deployinterface)
 
 ## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
 Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
@@ -266,7 +274,7 @@ Create a POD and deploy it to minikube
 kubectl apply -f my-memcache-deployment.yml
 ```
 
-### Start User-Interface
+## Start User-Interface <a name="deployinterface"></a>
 
 Check if service is running on minikube
 ```
