@@ -263,4 +263,21 @@ Create a POD and deploy it to minikube
 kubectl apply -f my-memcache-deployment.yml
 ```
 
+### Start User-Interface
 
+Check if service is running on minikube
+
+minikube dashboard
+
+
+Navigate to /app/
+
+cd ../app/
+
+
+Build Interface-Dockerfile and run interface-deployment
+
+docker build -t interface .
+
+
+Run interface-Deployment
