@@ -4,5 +4,5 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY kafka_subscriber.py ./
-CMD ["python", "-u", "./kafka_subscriber.py"]
+COPY spark_control.py ./
+CMD ["python", "-u", "./spark_control.py"]

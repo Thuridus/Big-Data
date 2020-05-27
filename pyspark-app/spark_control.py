@@ -62,7 +62,7 @@ class SparkDriverJob:
         group = str(yamlobj["apiVersion"]).split('/')[0]
         version = str(yamlobj["apiVersion"]).split('/')[1]
 
-        config.load_kube_config()
+        config.load_incluster_config()
         configuration = client.Configuration()
         k8sapi = client.CustomObjectsApi(client.ApiClient(configuration))
         v1 = client.CoreV1Api(client.ApiClient(configuration))
@@ -122,14 +122,16 @@ class SparkDriverJob:
         coronafilename = ''
         coronadirstat = self.hdfsconnection.list_dir("/result/corona/")['FileStatuses']['FileStatus']
         for dirstat in coronadirstat:
-            if dirstat['pathSuffix'] is not '_SUCCESS':
+            if dirstat['pathSuffix'] != '_SUCCESS':
                 coronafilename = dirstat['pathSuffix']
+                break
         
         daxfilename = ''
         daxdirstat = self.hdfsconnection.list_dir("/result/dax/")['FileStatuses']['FileStatus']
         for dirstat in daxdirstat:
-            if dirstat['pathSuffix'] is not '_SUCCESS':
+            if dirstat['pathSuffix'] != '_SUCCESS':
                 daxfilename = dirstat['pathSuffix']
+                break
 
         covidcsv = self.hdfsconnection.read_file("/result/corona/" + coronafilename).decode()
         dataframecovid = pandas.read_csv(StringIO(covidcsv), index_col='date', keep_default_na=False)
@@ -146,6 +148,7 @@ class SparkDriverJob:
         with dbengine.connect() as dbconnection:
             dataframecovid.to_sql('infects', dbconnection, if_exists='append')
             dataframedax.to_sql('dax', dbconnection, if_exists='append')
+            print("New data successfully inserted")
 
     def ValidateExport(self):
         dbtest = mysql.connector.connect(host=self.dbhost, port=self.dbport, user=self.dbuser, password=self.dbpw, database=self.dbname, auth_plugin='mysql_native_password')
@@ -184,12 +187,16 @@ driverjob.ClearEnv()
 driverjob.InitEnv()
 # First time we start
 print("start spark execution on fist start")
-driverjob.RunOnce()
+try:
+    driverjob.RunOnce()
+except ApiException as exception:
+    print(exception)
 
-#for msg in consumer:
-#    print("Message Received: ", msg)
-#    message = str(msg.value.decode())
-#    if message == 'new_data_available':
-#        print("Received import notification from import pod. Starting Spark execution.")
-#        driverjob.RunOnce()
-#        print("Driver Job finished. New Data in available in DB")
+while True:
+    for msg in consumer:
+        print("Message Received: ", msg)
+        message = str(msg.value.decode())
+        if message == 'new_data_available':
+            print("Received import notification from import pod. Starting Spark execution.")
+            driverjob.RunOnce()
+            print("Driver Job finished. New Data in available in DB")

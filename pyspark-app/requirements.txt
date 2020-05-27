@@ -3,3 +3,5 @@ mysql-connector
 kubernetes
 kafka-python
 sqlalchemy
+pandas
+PyMySQL
