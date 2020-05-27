@@ -233,7 +233,7 @@ helm install spark incubator/sparkoperator --namespace spark-operator --set spar
 ```
 
 ## Deploy the database
-### Create necessary DB-POD
+### Create necessary DB-Pod
 
 Build a connection to the "my-database" folder
 ```
