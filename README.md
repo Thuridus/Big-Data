@@ -9,11 +9,10 @@ Check "Big Data Architecture" for further information about the functionality an
 2. [Funktionsweise der Benutzeroberfläche](#oberfläche)
 3. [Starting minikube](#minikube)
 4. [Deploy HDFS on K8S](#k8s)
-5. [Deploy the periodic import pod on K8S](#deplox)
-6. [Deploy Kafka cluster on K8S](#kafkacluser)
-7. [Deploy Spark on K8S](#sparkk8s)
-8. [Deploy the database](#deploydb)
-9. [Start User-Interface](#deployinterface)
+5. [Deploy Kafka cluster on K8S](#kafkacluser)
+6. [Deploy Spark on K8S](#sparkk8s)
+7. [Deploy the database](#deploydb)
+8. [Start User-Interface](#deployinterface)
 
 ## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
 Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
@@ -194,9 +193,8 @@ helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
 helm install --set "knox.hadoop.nameNodeUrl=hdfs://hadoop-hadoop-hdfs-nn:9000/" --set "knox.hadoop.resourceManagerUrl=http://hadoop-hadoop-yarn-rm:8088/ws" --set "knox.hadoop.webHdfsUrl=http://hadoop-hadoop-hdfs-nn:50070/webhdfs/" --set "knox.hadoop.hdfsUIUrl=http://hadoop-hadoop-hdfs-nn:50070" --set "knox.hadoop.yarnUIUrl=http://hadoop-hadoop-yarn-ui:8088" --set "knox.servicetype=LoadBalancer" knox pfisterer-knox/apache-knox-helm
 ```
 
-
-## Deploy the periodic import pod on K8S:<a name="deplox"></a>
-### Create necessary docker image for Data import POD
+### Deploy the periodic import pod on K8S:
+Create necessary docker image for Data import POD
 ```
 # After running the docker-env command, navigate to the python_hdfs directory (it contains one dockerfile)
 # the created image will connect to the knox-apache-knox-helm-svc via DNS Lookup within the K8S cluster
@@ -207,13 +205,6 @@ Apply the import deployment
 #navigate to the python_hdfs directory
 kubectl apply -f python_import_deployment.yml
 ```
-
-To be able to PUT your files to HDFS via REST API need to know IP/webhdfs/v1
-```
-# This command returns the external web address of the service that's hosting the knox service for the webhdfs API
-minikube service knox-apache-knox-helm-svc --url
-```
-
 
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
 ### Install Strimzi operator and Cluster Definition
