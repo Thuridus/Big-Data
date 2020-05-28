@@ -32,16 +32,19 @@ class SparkDriverJob:
         self.hdfsconnection.delete_file_dir("/result", recursive=True)
 
     def InitEnv(self):
+        print("Creating environment")
         # Create the app folder on hdfs and store file to it
         driverurl = 'https://raw.githubusercontent.com/Thuridus/Big-Data/develop/pyspark-app/pyspark_driver.py'
         drivercontent = requests.get(driverurl).content
         self.hdfsconnection.make_dir("/app", permission=777)
         self.hdfsconnection.create_file("/app/pyspark_driver.py", drivercontent)
+        print("Stored pyspark_driver.py on HDFS")
         # Create the config folder on hdfs and store file to it
         deploymenturl = 'https://raw.githubusercontent.com/Thuridus/Big-Data/develop/pyspark-app/python_deployment.yml'
         deploymentcontent = requests.get(deploymenturl).content
         self.hdfsconnection.make_dir("/config", permission=777)
         self.hdfsconnection.create_file("config/python_deployment.yml", deploymentcontent)
+        print("Stored deployment.yml on HDFS")
         # Create the result directory
         self.hdfsconnection.make_dir("/result/corona", permission=777)
         self.hdfsconnection.make_dir("/result/dax", permission=777)
@@ -71,7 +74,7 @@ class SparkDriverJob:
             self.hdfsconnection.delete_file_dir("/result", recursive=True)
             self.hdfsconnection.make_dir("/result/corona", permission=777)
             self.hdfsconnection.make_dir("/result/dax", permission=777)
-
+            print("Try to delete existing driver")
             # ensure that resource is deleted
             k8sapi.delete_namespaced_custom_object(group=group, version=version,plural="sparkapplications", name="python-spark", namespace="default", body=client.V1DeleteOptions())
         except ApiException as exception:
@@ -81,6 +84,7 @@ class SparkDriverJob:
         driverSuccessfull = False
         driverrunning = True
         try:
+            print("Try to create driver pod")
             k8sapi.create_namespaced_custom_object(group=group, version=version, namespace="default", plural="sparkapplications", body=yamlobj)
             print("Driver pod created")
 
@@ -98,10 +102,13 @@ class SparkDriverJob:
 
                         break
                 if driverrunning:
+                    print("Wait for driver pod to finish")
                     time.sleep(5)
 
             #Delete driver        
+            print("Try to delete driver pod")
             k8sapi.delete_namespaced_custom_object(group=group, version=version,plural="sparkapplications", name="python-spark", namespace="default", body=client.V1DeleteOptions())
+            print("Driver pod deleted")
         except ApiException as exception:
             print(exception)
         
@@ -189,10 +196,13 @@ driverjob.InitEnv()
 print("start spark execution on fist start")
 try:
     driverjob.RunOnce()
+    print("First run successfully finished")
 except ApiException as exception:
+    print("Exeption on first run has occured")
     print(exception)
 
 while True:
+    print("Waiting for kafka notifications")
     for msg in consumer:
         print("Message Received: ", msg)
         message = str(msg.value.decode())
@@ -200,3 +210,4 @@ while True:
             print("Received import notification from import pod. Starting Spark execution.")
             driverjob.RunOnce()
             print("Driver Job finished. New Data in available in DB")
+print("Programm exited")

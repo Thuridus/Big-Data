@@ -17,8 +17,13 @@ sh ./install_hdfs.sh
 cd ..
 # Install the Spark component
 echo 'Installing Spark component'
-cd ./pyspark_app
+cd ./pyspark-app
 sh ./install_pyspark.sh
+cd ..
+# Install the Web Component
+echo 'Installing Web component'
+cd ./app
+sh ./install_app.sh
 cd ..
 echo 'System install finished'
 # See it all rising
