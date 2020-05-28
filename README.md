@@ -216,7 +216,7 @@ minikube service knox-apache-knox-helm-svc --url
 
 
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
-### Install Strimzi operator
+### Install Strimzi operator and Cluster Definition
 Execute the following commands to install kafka cluster.
 Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component
 ```
@@ -224,9 +224,8 @@ Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install
 helm repo add strimzi http://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
 ```
-### Apply Kafka Cluster Deployment
+Apply Kafka Cluster Deployment
 ```
-#Navigate shell into 'kafka-config' folder
 kubectl apply -f kafka-cluster-def.yaml
 ```
 
