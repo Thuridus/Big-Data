@@ -217,38 +217,54 @@ minikube service knox-apache-knox-helm-svc --url
 
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
 ### Install Strimzi operator
-Install strimzi operator via Helm
+Execute the following commands to install kafka cluster.
+Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component
 ```
+#Install strimzi operator via Helm
 helm repo add strimzi http://strimzi.io/charts/
 helm install kafka-operator strimzi/strimzi-kafka-operator
 ```
 ### Apply Kafka Cluster Deployment
-Navigate shell into 'kafka-config' folder
 ```
+#Navigate shell into 'kafka-config' folder
 kubectl apply -f kafka-cluster-def.yaml
 ```
 
 
 ## Deploy Spark on K8S <a name="sparkk8s"></a>
-
-The pyspark app is put into hdfs /app/ 
-
-### Spark Operator in separate workspace
-Create a namespace with the name ‘spark-operator’
+### Spark Operator
+Execute the following commands to install pyspark.
+Alternatively run 'sh install_pyspark.sh' in the ../pyspark-app folder to install whole pyspark component
 ```
 #navigate to the folder "pyspark-app"
+#Create a namespace with the name ‘spark-operator’
 kubectl create namespace spark-operator
 
 #create a service account with the name ‘spark’
 kubectl create serviceaccount spark --namespace=default
 
-#create RBAC role for svc spar
+#create RBAC role for spark serviceaccount
 kubectl create clusterrolebinding spark-operator-role --clusterrole=cluster-admin --serviceaccount=default:spark --namespace=default
 
-#install helm repo
+#add helm repo
 helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
 
+#install helm chart incubator spark-operator
 helm install spark incubator/sparkoperator --namespace spark-operator --set sparkJobNamespace=default
+```
+
+### Spark Controller Pod
+This pod automatically reacts to kafka messages and starts a custom spark-drive resource via the Kubernetes API
+The result of the calculation is then stored to the Database
+```
+# Create clusterrolebinding for spark controller pod
+kubectl create clusterrolebinding default-edit-role --clusterrole=cluster-admin --serviceaccount=default:default --namespace=default
+
+# Create docker image for driver
+docker build -t spark_control .
+
+# run deployment
+kubectl apply -f spark_control_deployment.yml
 ```
 
 
