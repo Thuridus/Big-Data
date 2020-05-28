@@ -170,24 +170,21 @@ minikube addons enable ingress
 
 ## Deploy HDFS on K8S: <a name="k8s"></a>
 ### Deploying HDFS 
+Execute the following commands to install the apache hadoop distributed filesystem component.
+Alternatively run 'sh install_hdfs.sh' in the ../python_hdfs folder to install whole hdfs component.
 
-Add helm stable repo and install chart for stable hadoop cluster
 ```
+#Add helm stable repo and install chart for stable hadoop cluster
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 # if using helm for the first time run "helm init"
 helm install --namespace=default --set hdfs.dataNode.replicas=2 --set yarn.nodeManager.replicas=1 --set hdfs.webhdfs.enabled=true hadoop stable/hadoop
-```
 
-Adjust user rights on root folder to be able to acces filesystem via WEBHDFS
-```
-kubectl exec -ti hadoop-hadoop-yarn-rm-0 bash
-hdfs dfs -chmod  777 /
-exit
+#Adjust user rights on root folder to be able to acces filesystem via WEBHDFS
+kubectl exec -ti hadoop-hadoop-yarn-rm-0 -- hdfs dfs -chmod  777 /
 ```
 
 ### Install Apache Knox - REST API and Application Gateway
-
-using helm chart pfisterer/apache-knox-helm
+Install Apachae Knox API and Gateway using helm chart pfisterer/apache-knox-helm
 ```
 helm repo add pfisterer-knox https://pfisterer.github.io/apache-knox-helm/
 helm install --set "knox.hadoop.nameNodeUrl=hdfs://hadoop-hadoop-hdfs-nn:9000/" --set "knox.hadoop.resourceManagerUrl=http://hadoop-hadoop-yarn-rm:8088/ws" --set "knox.hadoop.webHdfsUrl=http://hadoop-hadoop-hdfs-nn:50070/webhdfs/" --set "knox.hadoop.hdfsUIUrl=http://hadoop-hadoop-hdfs-nn:50070" --set "knox.hadoop.yarnUIUrl=http://hadoop-hadoop-yarn-ui:8088" --set "knox.servicetype=LoadBalancer" knox pfisterer-knox/apache-knox-helm
@@ -199,17 +196,15 @@ Create necessary docker image for Data import POD
 # After running the docker-env command, navigate to the python_hdfs directory (it contains one dockerfile)
 # the created image will connect to the knox-apache-knox-helm-svc via DNS Lookup within the K8S cluster
 docker build -t python_download .
-```
-Apply the import deployment
-```
-#navigate to the python_hdfs directory
+
+#Apply the import deployment inside the python_hdfs directory
 kubectl apply -f python_import_deployment.yml
 ```
 
 ## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
 ### Install Strimzi operator and Cluster Definition
 Execute the following commands to install kafka cluster.
-Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component
+Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component.
 ```
 #Install strimzi operator via Helm
 helm repo add strimzi http://strimzi.io/charts/
@@ -224,7 +219,7 @@ kubectl apply -f kafka-cluster-def.yaml
 ## Deploy Spark on K8S <a name="sparkk8s"></a>
 ### Spark Operator
 Execute the following commands to install pyspark.
-Alternatively run 'sh install_pyspark.sh' in the ../pyspark-app folder to install whole pyspark component
+Alternatively run 'sh install_pyspark.sh' in the ../pyspark-app folder to install whole pyspark component.
 ```
 #navigate to the folder "pyspark-app"
 #Create a namespace with the name ‘spark-operator’
