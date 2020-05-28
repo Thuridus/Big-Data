@@ -89,7 +89,11 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 
 ### Datenbank (MySQL-Datenbank): 
 * Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
-* Tabelle sieht so aus: ....
+* Das Datenbankschema besteht aus den Tabellen "infects" und "dax", die wie folgt aufgebaut sind (die Datentypen werden jeweils in Klammer geschrieben):
+* Tabelle "dax" enthält die Spalten 'date' (date), 'cases' (integer), 'deaths' (integer), 'country' (varchar), 'continent' (varchar), 'continent' (varchar), 'cases_prev' (integer), 'dead_prev' (integer), 'cases_rel_diff' (decimal), 'deaths_rel_diff' (decimal). 
+Die Primärschlüssel sind dabei 'date' und 'country'.
+* Tabelle "dax" enthält die Spalten 'date' (date), 'open' (decimal), 'close' (decimal), 'diff' (decimal).
+Der Primärschlüssel ist 'date'.
 
 ### Web Server (Node.js):
 * Zeigt Grafik zu den Daten Covid und Börse an (X-Achse Zeit und Y-Achse Ansteckungen / Kurs)
