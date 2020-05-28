@@ -237,7 +237,7 @@ The pyspark app is put into hdfs /app/
 Create a namespace with the name ‘spark-operator’
 ```
 #navigate to the folder "pyspark-app"
-kubectl create -f namespaces-spark.yml
+kubectl create namespace spark-operator
 
 #create a service account with the name ‘spark’
 kubectl create serviceaccount spark --namespace=default
