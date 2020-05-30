@@ -89,7 +89,7 @@ $$(".convert-form-to-data").on("click", function () {
       key += "day";
     }
 
-    var sql = `SELECT YEAR(dax.date) as year, ${grouptyp}(dax.date) as field, sum(infects.${coronaTyp}) as corona, sum(dax.diff) as dax FROM infects INNER JOIN dax ON infects.date = dax.date WHERE dax.date BETWEEN '${content.startDate}' AND '${content.endDate}' AND country IN (${countrys}) GROUP BY YEAR(dax.date), ${grouptyp}(dax.date) ORDER BY YEAR(dax.date), MONTH(dax.date);`;
+    var sql = `SELECT YEAR(dax.date) as year, ${grouptyp}(dax.date) as field, DATE_FORMAT(dax.date, '%d.%m.%Y') as day, sum(infects.${coronaTyp}) as corona, sum(dax.diff) as dax FROM infects INNER JOIN dax ON infects.date = dax.date WHERE dax.date BETWEEN '${content.startDate}' AND '${content.endDate}' AND country IN (${countrys}) GROUP BY YEAR(dax.date), ${grouptyp}(dax.date) ORDER BY YEAR(dax.date), MONTH(dax.date);`;
     
     app.request.postJSON('/serverAbfrageStarten/', {"sql": sql, "key": key, "grouptyp": grouptyp}, function (data) {
       $$("#zeitstrahl").html("");

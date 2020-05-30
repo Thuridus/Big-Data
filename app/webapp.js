@@ -87,10 +87,10 @@ async function getFromDatabase(query, grouptyp) {
 		}else if(grouptyp == "WEEK"){
 			element.fieldname = "KW " + row[1] + " " + row[0];
 		}else{
-			element.fieldname = row[1];
+			element.fieldname = row[2];
 		}
-        element.corona = row[2];
-		element.dax = row[3];
+        element.corona = row[3];
+		element.dax = row[4];
 		resultJSON.push(element);
 	}
 	console.log(resultJSON);
