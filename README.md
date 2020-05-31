@@ -23,15 +23,15 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 - [X] Komponente: Big Data Processing (Apache Spark)
 - [X] Komponente: DB Server (mysql)
 - [X] Komponente: Load Balancer (Ingress)
-- [ ] Komponente: Web Server => Fehlerbehebung läuft
-- [ ] Komponente: Cache Server => Fehlerbehebung läuft
+- [X] Komponente: Web Server => Fehlerbehebung läuft
+- [X] Komponente: Cache Server => Fehlerbehebung läuft
 - [X] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
 - [X] Das Ergebnis der Berechnungen im Big Data-System werden in der Datenbank gespeichert
 - [X] Der Web Server liefert diese Ergebnisse aus
 - [X] Lizenz Quellcode (Apache)
 - [X] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
 - [ ] Dokumentation der Anwendung
-- [ ] Screencast => Erstellt FG
+- [X] Screencast => Erstellt FG
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
 - [X] Grundsätzliche Idee der Anwendung erklären
