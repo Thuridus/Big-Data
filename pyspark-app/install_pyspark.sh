@@ -12,5 +12,3 @@ helm install spark incubator/sparkoperator --namespace spark-operator --set spar
 kubectl create clusterrolebinding default-edit-role --clusterrole=cluster-admin --serviceaccount=default:default --namespace=default
 # Create docker image for driver
 docker build -t spark_control .
-# run deployment
-kubectl apply -f spark_control_deployment.yml

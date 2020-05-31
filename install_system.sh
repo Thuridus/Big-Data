@@ -25,6 +25,8 @@ echo 'Installing Web component'
 cd ./app
 sh ./install_app.sh
 cd ..
+echo 'Wait for Pods to start up to apply deployments'
+sh ./apply_deployments.sh
 echo 'System install finished'
 # See it all rising
 watch kubectl get all
