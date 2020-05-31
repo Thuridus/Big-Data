@@ -136,10 +136,10 @@ Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in
 
 ## Screencast der fertigen Anwendung <a name="screencast"></a>
 ### Screencast Installation
-(https://www.youtube.com/watch?v=jReU8k_S5ac "Screencast Part 1 (Installation)")
+[Screencast Part 1 (Installation)](https://www.youtube.com/watch?v=jReU8k_S5ac "Screencast Part 1 (Installation)")
 
 ### Screencast der Oberfläche
-(https://www.youtube.com/watch?v=ZuJHFPglDBE "Screencast Part 2 (User-Interface)")
+[Screencast Part 2 (User Interface)](https://www.youtube.com/watch?v=ZuJHFPglDBE "Screencast Part 2 (User-Interface)")
 
 ### Prerequisites 
 
