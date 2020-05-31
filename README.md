@@ -5,15 +5,16 @@ Big Data Platform to run a Corona App via Web. The aim of the project is to prov
 Check "Big Data Architecture" for further information about the functionality and the file Big-Data/LICENCE for lincensification.
 
 ## Inhaltsverzeichnis
-1. [Big Data Architecture](#architecture)
-2. [Funktionsweise der Benutzeroberfläche](#oberfläche)
-3. [Screencast der fertigen Anwendung](#screencast)
-4. [Starting minikube](#minikube)
-5. [Deploy HDFS on K8S](#k8s)
-6. [Deploy Kafka cluster on K8S](#kafkacluser)
-7. [Deploy Spark on K8S](#sparkk8s)
-8. [Deploy the database](#deploydb)
-9. [Start User-Interface](#deployinterface)
+ 1. [Big Data Architecture](#architecture)
+ 2. [Funktionsweise der Benutzeroberfläche](#oberfläche)
+ 3. [Screencast der fertigen Anwendung](#screencast)
+ 4. [Install-Guide](#installation)
+ 5. [Starting minikube](#minikube)
+ 6. [Deploy Kafka cluster on K8S](#kafkacluser)
+ 7. [Deploy HDFS on K8S](#k8s)
+ 8. [Deploy the database](#deploydb)
+ 9. [Deploy Spark on K8S](#sparkk8s)
+10. [Start User-Interface](#deployinterface)
 
 ## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
 Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
@@ -30,7 +31,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 - [X] Der Web Server liefert diese Ergebnisse aus
 - [X] Lizenz Quellcode (Apache)
 - [X] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
-- [ ] Dokumentation der Anwendung
+- [X] Dokumentation der Anwendung
 - [X] Screencast => Erstellt FG
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
@@ -81,12 +82,27 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 
 ### Big Data&Science Processing (Apache Spark):
 * Dient dem Data Processing der Daten aus HDFS
-* Wenn Apache Spark Consumer msg erhält dass neue Daten in HDFS sind dann greift Apache Spark auf die Daten in HDFS zu
-* Apache Spark verarbeitet die Daten und sendet an die Datenbank
-* Bevor die Daten an die MySQL-DB gesendet werden, werden die Daten vorbereitet:
+* Besteht aus zwei Komponenten:
+ 1. Spark-Controller: Läuft dauerhaft im K8S. Startet und überwacht die Ausführung der Spark-Berechnungen.
+ 2. Spark-Driver: Liest die Importierten Daten aus HDFS und führt Rechenoperationen aus. Speichert Ergebnisdaten in HDFS.
+ 
+#### Spark-Controller
+- Pod der als Deamon ausgeführt wird
+- Ist Kafka-Konsument. Reagiert auf Kafka Notification und überwacht Spark-Driver ausführung.
+- Startet Spark-Driver Ausführung im 'Cluster-Mode'. YML-Datei für Spark-Driver ist auf HDFS gespeichert. (Realisiert mithilfe von Custom-Resource-Definiton)
+- Wartet bis Spark-Driver Status "Completed" hat.
+- Löscht Spark-Driver aus K8S
+- Liest Ergebnisse der Spark-Drivers aus HDFS und export diese in die MYSQL-Database.
+
+#### Spark-Driver
+- Wird von Spark-Controller gestartet.
+- Führt programmierte Rechenoperationen auf Eingabedaten aus. (Driver-Logik ist in Python-Datei auf HDFS definiert)
+- Startet N-Executor Pods die das Ergebnis berechnen. (Anzahl Executor Pods ist in YML-Datei auf HDFS definiert)
   * Unnötige Daten werden aussortiert
   * Aktienkurse werden zu DAX aufsummiert
   * Absolute und relative Veränderungen zwischen den Tagen werden kalkuliert
+- Überwacht Executor Pods.
+- Sammelt das Ergebnis und schreibt es in das HDFS.
 
 ### Datenbank (MySQL-Datenbank): 
 * Rationale Datenbank speichert von Apache Kafka aufbereitete Daten.
@@ -142,20 +158,37 @@ Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in
 [Screencast Part 2 (User Interface)](https://www.youtube.com/watch?v=ZuJHFPglDBE "Screencast Part 2 (User-Interface)")
 
 ### Prerequisites 
-
-TODO: What things you need to install the software and how to install them
-
+This Software is required to run the Big-Data Application. (This application is intended to be used on based Ubuntu-OS)
 ```
-Docker
 minikube
 helm
-python3 spark pyspark 
 ```
 
+# Install-Guide
+## Installation Methods <a name="installation"></a>
+### Automatic Installation
+This is the recommended installation method.
+The Base-Directory contains a script to setup the whole environment.
+There has to be a empty minikube cluster with Ingress-Addon enabled on your system. [Start Minikube](#minikube)
+After minikube has started, execute the installation script
+```
+sh install_system.sh
+```
+
+### Manual installation
+Alternatively this system can be installed by executing the necessary commands manually.
+The following sections contain the commands that need to be executed to start the components.
+The components need to be started in the following order:
+1. [Start Minikube](#minikube)
+2. [Kafka Cluster] (#kafkacluser)
+3. [HDFS] (#k8s)
+4. [MYSQLDB and MemcacheD] (#deploydb)
+5. [Start Spark] (#sparkk8s)
+6. [User-Interface] (#deployinterface)
 
 ## Starting minikube <a name="minikube"></a>
 
-Start minicube with Hyper V driver (make sure Hyper V is enabled)
+Start minikube with driver depending on your OS.
 ```
 #on Win 10
 minikube start --driver=hyperv --memory 5120 --cpus 4
@@ -166,7 +199,13 @@ minikube start --vm-driver=hyperkit --memory 5120 --cpus 4
 #on Ubuntu
 minikube start --driver=none
 ```
-Pointing Docker daemon to minicube regestry
+
+Enable Load Balancer (Ingress)
+```
+minikube addons enable ingress
+```
+
+Pointing Docker daemon to minikube registry (Not needed on Ubuntu)
 ```
 #on Win 10
 minikube docker-env
@@ -175,11 +214,20 @@ minikube -p minikube docker-env | Invoke-Expression
 #on Mac
 eval $(minikube docker-env)
 ```
-Enable Load Balancer (Ingress)
-```
-minikube addons enable ingress
-```
 
+## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
+### Install Strimzi operator and Cluster Definition
+Execute the following commands to install kafka cluster.
+Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component.
+```
+#Install strimzi operator via Helm
+helm repo add strimzi http://strimzi.io/charts/
+helm install kafka-operator strimzi/strimzi-kafka-operator
+```
+Apply Kafka Cluster Deployment
+```
+kubectl apply -f kafka-cluster-def.yaml
+```
 
 ## Deploy HDFS on K8S: <a name="k8s"></a>
 ### Deploying HDFS 
@@ -214,21 +262,37 @@ docker build -t python_download .
 kubectl apply -f python_import_deployment.yml
 ```
 
-## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
-### Install Strimzi operator and Cluster Definition
-Execute the following commands to install kafka cluster.
-Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component.
+
+## Deploy the database <a name="deploydb"></a>
+### Create necessary DB-Pod
+
+Build a connection to the "my-database" folder
 ```
-#Install strimzi operator via Helm
-helm repo add strimzi http://strimzi.io/charts/
-helm install kafka-operator strimzi/strimzi-kafka-operator
-```
-Apply Kafka Cluster Deployment
-```
-kubectl apply -f kafka-cluster-def.yaml
+#navigate to the folder my-database
+cd my-database
 ```
 
+Create a POD and deploy it to minikube
+```
+kubectl apply -f config-app.yml
+kubectl apply -f my-mysql-deployment.yml
+```
+```
+#To be sure that the POD is running and to get the POD-name, enter
+kubectl get pods -o wide
+#You have to choose the POD with the name my-mysql-deployment-xxxxxxxxx-xxxxx (x=numbers/characters)
+```
 
+```
+#Enter the pod to check if its working
+kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
+```
+### Create necessary Memcached-Pod
+
+Create a POD and deploy it to minikube
+```
+kubectl apply -f my-memcache-deployment.yml
+```
 ## Deploy Spark on K8S <a name="sparkk8s"></a>
 ### Spark Operator
 Execute the following commands to install pyspark.
@@ -263,38 +327,6 @@ docker build -t spark_control .
 
 # run deployment
 kubectl apply -f spark_control_deployment.yml
-```
-
-
-## Deploy the database <a name="deploydb"></a>
-### Create necessary DB-Pod
-
-Build a connection to the "my-database" folder
-```
-#navigate to the folder my-database
-cd my-database
-```
-
-Create a POD and deploy it to minikube
-```
-kubectl apply -f config-app.yml
-kubectl apply -f my-mysql-deployment.yml
-```
-```
-#To be sure that the POD is running and to get the POD-name, enter
-kubectl get pods -o wide
-#You have to choose the POD with the name my-mysql-deployment-xxxxxxxxx-xxxxx (x=numbers/characters)
-```
-
-```
-#Enter the pod to check if its working
-kubectl exec -ti [my-mysql-deployment-xxxxxxxxx-xxxxx] -- mysql -u root --password=mysecretpw
-```
-### Create necessary Memcached-Pod
-
-Create a POD and deploy it to minikube
-```
-kubectl apply -f my-memcache-deployment.yml
 ```
 
 ## Start User-Interface <a name="deployinterface"></a>
