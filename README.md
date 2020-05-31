@@ -133,6 +133,12 @@ Bei den Coronadaten können wahlweise entweder die tatsächliche Tagesveränderu
 #### Art der Coronadaten
 Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
 
+### Screencast der Anwendung
+#### Screencast Installation
+(https://www.youtube.com/watch?v=jReU8k_S5ac "Screencast Part 1 (Installation)")
+
+#### Screencast der Oberfläche
+(https://www.youtube.com/watch?v=ZuJHFPglDBE "Screencast Part 2 (User-Interface)")
 
 ### Prerequisites 
 
