@@ -7,12 +7,13 @@ Check "Big Data Architecture" for further information about the functionality an
 ## Inhaltsverzeichnis
 1. [Big Data Architecture](#architecture)
 2. [Funktionsweise der Benutzeroberfläche](#oberfläche)
-3. [Starting minikube](#minikube)
-4. [Deploy HDFS on K8S](#k8s)
-5. [Deploy Kafka cluster on K8S](#kafkacluser)
-6. [Deploy Spark on K8S](#sparkk8s)
-7. [Deploy the database](#deploydb)
-8. [Start User-Interface](#deployinterface)
+3. [Screencast der fertigen Anwendung](#screencast)
+4. [Starting minikube](#minikube)
+5. [Deploy HDFS on K8S](#k8s)
+6. [Deploy Kafka cluster on K8S](#kafkacluser)
+7. [Deploy Spark on K8S](#sparkk8s)
+8. [Deploy the database](#deploydb)
+9. [Start User-Interface](#deployinterface)
 
 ## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
 Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
@@ -133,11 +134,11 @@ Bei den Coronadaten können wahlweise entweder die tatsächliche Tagesveränderu
 #### Art der Coronadaten
 Bei den Coronadaten können entweder die Neuerkrankungen oder die Todesfälle in Relation zum Aktienkurs angezeigt werden. 
 
-### Screencast der Anwendung
-#### Screencast Installation
+## Screencast der fertigen Anwendung <a name="screencast"></a>
+### Screencast Installation
 (https://www.youtube.com/watch?v=jReU8k_S5ac "Screencast Part 1 (Installation)")
 
-#### Screencast der Oberfläche
+### Screencast der Oberfläche
 (https://www.youtube.com/watch?v=ZuJHFPglDBE "Screencast Part 2 (User-Interface)")
 
 ### Prerequisites 
