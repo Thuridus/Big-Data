@@ -57,20 +57,14 @@ spec:
               port: 33060
             initialDelaySeconds: 5
             periodSeconds: 10
-      #          resources:
-      #            requests:
-      #              cpu: 1
-      #              memory: "200M"
-      #            limits:
-      #              cpu: 1
-      #              memory: "200M"
       # Define an empty volume to be shared by the init and mysql container
       volumes:
         - name: data-volume
           emptyDir: {}
-        - name: mysql-config-volume ## volume name
+          # Config volume is needed to enable access via Python
+        - name: mysql-config-volume
           configMap:
-            name: mysql-config ## name of ConfigMap
+            name: mysql-config
 
 ---
 apiVersion: v1

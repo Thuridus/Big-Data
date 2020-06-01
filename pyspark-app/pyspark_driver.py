@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.functions import to_date, expr, current_date, date_sub, date_format
 
+# These are the static paths to the input and output files
 inputInfections = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/infections.csv"
 inputDAX = "hdfs://hadoop-hadoop-hdfs-nn:9000/input/quandl_fse.csv"
 
