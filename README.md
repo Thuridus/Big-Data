@@ -180,7 +180,7 @@ Alternatively this system can be installed by executing the necessary commands m
 The following sections contain the commands that need to be executed to start the components.
 The components need to be started in the following order:
 1. [Start Minikube](#minikube)
-2. [Kafka Cluster] (#kafkacluser)
+2. [Kafka Cluster] (#kafkacluster)
 3. [HDFS] (#k8s)
 4. [MYSQLDB and MemcacheD] (#deploydb)
 5. [Start Spark] (#sparkk8s)
@@ -215,7 +215,7 @@ minikube -p minikube docker-env | Invoke-Expression
 eval $(minikube docker-env)
 ```
 
-## Deploy Kafka cluster on K8S: <a name="kafkacluser"></a>
+## Deploy Kafka cluster on K8S: <a name="kafkacluster"></a>
 ### Install Strimzi operator and Cluster Definition
 Execute the following commands to install kafka cluster.
 Alternatively run 'sh install_kafka.sh' in the ../kafka-config folder to install whole kafka component.
