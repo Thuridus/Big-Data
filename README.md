@@ -36,7 +36,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 - [ ] Dokumentation Architektur
 - [ ] Code kommentiert und formatiert und nachvollziehbar
 - [X] Grundsätzliche Idee der Anwendung erklären
-- [ ] Repo aufräumen
+- [X] Repo aufräumen
 - [ ] Abgabe des Git Repository
 
 
