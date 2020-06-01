@@ -127,7 +127,9 @@ Der Primärschlüssel ist 'date'.
 * In Memcached werden Daten maximal X Minuten gespeichert
 
 ### Load Balancer (Ingress):
-* Ingress => ML ergänzt
+* Das User-Interface wird mit Hilfe des Interace-Deployments gestartet
+* Dieses stellt außerdem einen Service bereit, über welchen der Load Balancer auf das Interface zugreift
+* Über die dem Load Balancer zugewiesene IP-Adresse kann das User-Interface in einem beliebigen Web-Browser aufgerufen werden
 
 ## Funktionsweise der Benutzeroberfläche <a name="oberfläche"></a>
 Die Benutzeroberfläche entspricht dem Endpunkt der Architektur, über welchen der Enduser in der Regel Daten der Anwendung abfragt. Hierzu kann nach dem Start der unterschiedlichen Architekturkomponenten (min. nach dem Start des Webservers (webapp.js)) die Adresse localhost:8080 über einen beliebigen Internetbrowser aufgerufen werden.
