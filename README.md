@@ -16,30 +16,6 @@ Check "Big Data Architecture" for further information about the functionality an
  9. [Deploy Spark on K8S](#sparkk8s)
 10. [Start User-Interface](#deployinterface)
 
-## :paperclip: Unsere To-Do-Liste (wird später gelöscht)
-Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php?forcedownload=1&file=%2F%2F69764%2Fblock_quickmail%2Fattachment_log%2F1700%2FAufgabenstellung%20Big%20Data%20Vorlesung%20April%202020.pdf
-
-- [X] Komponente: Data-Lake (HDFS)
-- [X] Komponente: Big Data Messaging (Kafka)
-- [X] Komponente: Big Data Processing (Apache Spark)
-- [X] Komponente: DB Server (mysql)
-- [X] Komponente: Load Balancer (Ingress)
-- [X] Komponente: Web Server => Fehlerbehebung läuft
-- [X] Komponente: Cache Server => Fehlerbehebung läuft
-- [X] Daten werden entweder in das System gestreamt oder wiederholt per Batch abgearbeitet
-- [X] Das Ergebnis der Berechnungen im Big Data-System werden in der Datenbank gespeichert
-- [X] Der Web Server liefert diese Ergebnisse aus
-- [X] Lizenz Quellcode (Apache)
-- [X] Quellcode der Anwendung, der zum Start und Betrieb der Gesamtanwendung notwendig ist
-- [X] Dokumentation der Anwendung
-- [X] Screencast => Erstellt FG
-- [ ] Dokumentation Architektur
-- [X] Code kommentiert und formatiert und nachvollziehbar
-- [X] Grundsätzliche Idee der Anwendung erklären
-- [X] Repo aufräumen
-- [ ] Abgabe des Git Repository
-
-
 ## Big Data Architecture :house:<a name="architecture"></a>
 
 ### Overview Architektur:
