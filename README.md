@@ -34,7 +34,7 @@ Unsere to-dos aus dem Pfisterer PDF https://elearning.cas.dhbw.de/pluginfile.php
 - [X] Dokumentation der Anwendung
 - [X] Screencast => Erstellt FG
 - [ ] Dokumentation Architektur
-- [ ] Code kommentiert und formatiert und nachvollziehbar
+- [X] Code kommentiert und formatiert und nachvollziehbar
 - [X] Grundsätzliche Idee der Anwendung erklären
 - [X] Repo aufräumen
 - [ ] Abgabe des Git Repository
