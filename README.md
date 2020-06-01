@@ -180,11 +180,11 @@ Alternatively this system can be installed by executing the necessary commands m
 The following sections contain the commands that need to be executed to start the components.
 The components need to be started in the following order:
 1. [Start Minikube](#minikube)
-2. [Kafka Cluster] (#kafkacluster)
-3. [HDFS] (#k8s)
-4. [MYSQLDB and MemcacheD] (#deploydb)
-5. [Start Spark] (#sparkk8s)
-6. [User-Interface] (#deployinterface)
+2. [Kafka Cluster](#kafkacluster)
+3. [HDFS](#k8s)
+4. [MYSQLDB and MemcacheD](#deploydb)
+5. [Start Spark](#sparkk8s)
+6. [User-Interface](#deployinterface)
 
 ## Starting minikube <a name="minikube"></a>
 
